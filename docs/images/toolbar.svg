@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="300" viewBox="0 0 1400 300" role="img" aria-labelledby="title desc">
+  <title id="title">Compact ZadLoop toolkit toolbar</title>
+  <desc id="desc">Illustrative mockup showing Themes, mode switching, Transfer, and session statistics.</desc>
+  <defs><linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1b202c"/><stop offset="1" stop-color="#141821"/></linearGradient><filter id="s"><feDropShadow dy="16" stdDeviation="22" flood-opacity=".35"/></filter></defs>
+  <rect width="1400" height="300" rx="26" fill="#0f1219"/>
+  <rect x="52" y="43" width="1296" height="210" rx="24" fill="url(#panel)" stroke="#303747" filter="url(#s)"/>
+  <rect x="96" y="76" width="1208" height="82" rx="22" fill="#252b38" stroke="#363e50"/>
+  <text x="127" y="125" fill="#768195" font-family="Segoe UI,Arial,sans-serif" font-size="20">Message or run a task, / commands, @ files or sessions</text>
+  <circle cx="1260" cy="117" r="27" fill="#667bd7"/><path d="M1260 132V102m0 0-10 10m10-10 10 10" stroke="#eaf0ff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(120 191)" font-family="Segoe UI,Arial,sans-serif" font-size="16" fill="#aab3c3">
+    <g><path d="M0 3h11m8 0h11M0 11h19m11 0h0M0 19h6m8 0h16" stroke="#8f9bad" stroke-width="1.8"/><circle cx="15" cy="3" r="2.5" fill="#8f9bad"/><circle cx="24" cy="11" r="2.5" fill="#8f9bad"/><circle cx="10" cy="19" r="2.5" fill="#8f9bad"/><text x="42" y="17">Themes</text></g>
+    <g transform="translate(180)"><path d="M0 6h24m0 0-5-5m5 5-5 5M28 18H4m0 0 5 5m-5-5 5-5" stroke="#8f9bad" stroke-width="1.8" fill="none" stroke-linecap="round"/><text x="40" y="17">Standard → Delegate</text><circle cx="188" cy="13" r="3" fill="#7c8cff"/></g>
+    <g transform="translate(450)"><rect x="0" y="0" width="27" height="24" rx="5" fill="none" stroke="#8f9bad" stroke-width="1.7"/><path d="M5 8h17m0 0-4-4m4 4-4 4M22 16H5m0 0 4-4m-4 4 4 4" stroke="#8f9bad" stroke-width="1.6" fill="none"/><text x="40" y="17">Transfer</text></g>
+    <g transform="translate(660)" fill="#788397"><circle cx="8" cy="12" r="7" fill="none" stroke="#788397"/><path d="M8 8v4l3 2" stroke="#788397" fill="none"/><text x="28" y="17">42 turns · 116 steps · 68 tok/s</text></g>
+    <g transform="translate(995)" fill="#788397"><circle cx="8" cy="12" r="7" fill="none" stroke="#788397"/><path d="M3 12h10" stroke="#788397"/><text x="28" y="17">24% context</text></g>
+  </g>
+  <text x="700" y="283" text-anchor="middle" fill="#5f6879" font-family="Segoe UI,Arial,sans-serif" font-size="14">Illustrative mockup — controls inherit the active ZadLoop theme</text>
+</svg>

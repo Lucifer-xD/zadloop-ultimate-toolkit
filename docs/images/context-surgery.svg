@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="700" viewBox="0 0 1400 700" role="img" aria-labelledby="title desc">
+  <title id="title">Context Surgery and Undo</title><desc id="desc">Safe illustrative chat showing separate reply editing, reasoning editing, removal, and Undo controls.</desc>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#10141d"/><stop offset="1" stop-color="#181d29"/></linearGradient><filter id="sh"><feDropShadow dy="18" stdDeviation="22" flood-opacity=".35"/></filter></defs>
+  <rect width="1400" height="700" rx="28" fill="url(#bg)"/>
+  <text x="80" y="78" fill="#f2f4fb" font-family="Segoe UI,Arial,sans-serif" font-size="32" font-weight="700">Context Surgery + Same-session Undo</text>
+  <text x="80" y="112" fill="#8792a7" font-family="Segoe UI,Arial,sans-serif" font-size="17">Correct the model-visible conversation without abandoning the session.</text>
+  <g filter="url(#sh)">
+    <rect x="80" y="154" width="1240" height="460" rx="24" fill="#1d2330" stroke="#343c4e"/>
+    <rect x="760" y="199" width="500" height="70" rx="22" fill="#30384a"/>
+    <text x="790" y="242" fill="#e8ebf4" font-family="Segoe UI,Arial,sans-serif" font-size="18">Summarize the launch plan in three steps.</text>
+    <rect x="120" y="311" width="1080" height="136" rx="18" fill="#171c26" stroke="#2c3444"/>
+    <circle cx="154" cy="350" r="15" fill="#7c8cff"/><path d="M147 350h14m-7-7v14" stroke="#fff" stroke-width="2"/>
+    <text x="185" y="354" fill="#f0f2f8" font-family="Segoe UI,Arial,sans-serif" font-size="19" font-weight="600">Assistant reply</text>
+    <text x="185" y="393" fill="#aeb7c8" font-family="Segoe UI,Arial,sans-serif" font-size="17">1. Validate the release.  2. Publish the package.  3. Share the install link.</text>
+    <g transform="translate(185 466)" font-family="Segoe UI,Arial,sans-serif" font-size="15">
+      <g><rect width="138" height="42" rx="11" fill="#252c3a" stroke="#3a4458"/><path d="M18 29l3-10 8-8 5 5-8 8-8 3z" fill="none" stroke="#aab5c8" stroke-width="1.7"/><text x="48" y="27" fill="#dce1eb">Edit reply</text></g>
+      <g transform="translate(152)"><rect width="166" height="42" rx="11" fill="#252c3a" stroke="#3a4458"/><path d="M18 13h15v15H18zM21 10h15v15" fill="none" stroke="#bd97ff" stroke-width="1.6"/><text x="48" y="27" fill="#dce1eb">Edit reasoning</text></g>
+      <g transform="translate(332)"><rect width="122" height="42" rx="11" fill="#252c3a" stroke="#3a4458"/><path d="M19 16h15m-12 0v14m9-14v14m-11-18h13" fill="none" stroke="#ff8fa3" stroke-width="1.7"/><text x="46" y="27" fill="#dce1eb">Remove</text></g>
+      <g transform="translate(468)"><rect width="110" height="42" rx="11" fill="#252c3a" stroke="#3a4458"/><path d="M29 14l-8 8 8 8m-8-8h15" fill="none" stroke="#55d6a1" stroke-width="1.8"/><text x="46" y="27" fill="#dce1eb">Undo</text></g>
+    </g>
+    <rect x="120" y="543" width="1080" height="42" rx="12" fill="#151a23"/>
+    <text x="142" y="570" fill="#718096" font-family="Consolas,monospace" font-size="15">/context edit 7 Replace only the reply while preserving reasoning and tool calls.</text>
+  </g>
+  <text x="700" y="661" text-anchor="middle" fill="#657086" font-family="Segoe UI,Arial,sans-serif" font-size="14">Append-only surface replacement · original durable events remain auditable</text>
+</svg>

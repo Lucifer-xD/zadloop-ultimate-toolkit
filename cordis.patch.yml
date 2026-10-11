@@ -1,0 +1,11 @@
+- insert:
+    - id: zadloop-toolkit-context-surgery-v4
+      name: "@wasd258/dsh-context-surgery"
+    - id: zadloop-toolkit-undo-v151
+      name: dsh-zadloop-undo
+    - id: zadloop-toolkit-mode-switcher-v203
+      name: dsh-zadloop-mode-switcher
+    - id: zadloop-toolkit-theme-studio-v503
+      name: dsh-zadloop-theme-studio
+    - id: zadloop-toolkit-session-transfer-v102
+      name: dsh-zadloop-session-transfer

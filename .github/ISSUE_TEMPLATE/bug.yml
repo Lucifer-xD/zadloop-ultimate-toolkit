@@ -1,0 +1,37 @@
+name: Bug report
+description: Report a reproducible toolkit problem using synthetic data.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: input
+    id: toolkit-version
+    attributes:
+      label: Toolkit version
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: zadloop-version
+    attributes:
+      label: ZadLoop and DSH versions
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Never attach credentials, real session exports, or private conversations.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="500" viewBox="0 0 1400 500" role="img" aria-labelledby="title desc">
+  <title id="title">ZadLoop Ultimate Toolkit</title>
+  <desc id="desc">A polished overview of the six features included in the all-in-one toolkit.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111522"/><stop offset=".52" stop-color="#171c2b"/><stop offset="1" stop-color="#0c111b"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#7c8cff" stop-opacity=".35"/><stop offset="1" stop-color="#7c8cff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#7c8cff"/><stop offset=".5" stop-color="#c178ff"/><stop offset="1" stop-color="#45c992"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#000" flood-opacity=".4"/></filter>
+  </defs>
+  <rect width="1400" height="500" rx="30" fill="url(#bg)"/>
+  <circle cx="260" cy="50" r="390" fill="url(#glow)"/><circle cx="1220" cy="430" r="330" fill="url(#glow)" opacity=".55"/>
+  <g opacity=".12" stroke="#aeb8ff"><path d="M0 100h1400M0 200h1400M0 300h1400M0 400h1400"/><path d="M175 0v500M350 0v500M525 0v500M700 0v500M875 0v500M1050 0v500M1225 0v500"/></g>
+  <g transform="translate(88 82)">
+    <rect width="58" height="58" rx="17" fill="url(#accent)"/>
+    <path d="M17 19h25L23 41h20" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="78" y="29" fill="#f5f7ff" font-family="Segoe UI,Arial,sans-serif" font-size="27" font-weight="700">ZadLoop Ultimate Toolkit</text>
+    <text x="78" y="55" fill="#8f99ad" font-family="Segoe UI,Arial,sans-serif" font-size="16">One tarball · six power features · offline installation</text>
+  </g>
+  <text x="88" y="218" fill="#f8f9ff" font-family="Segoe UI,Arial,sans-serif" font-size="48" font-weight="750">Everything your sessions need.</text>
+  <text x="88" y="263" fill="#aab3c8" font-family="Segoe UI,Arial,sans-serif" font-size="21">Edit context. Undo mistakes. Switch modes. Move chats. Redesign ZadLoop.</text>
+  <g transform="translate(88 320)" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="600" filter="url(#shadow)">
+    <g><rect width="188" height="54" rx="16" fill="#22283a" stroke="#404963"/><path d="M24 18h14M24 27h18M24 36h10" stroke="#8fa0ff" stroke-width="2.5" stroke-linecap="round"/><text x="55" y="33" fill="#e9ecf7">Context Surgery</text></g>
+    <g transform="translate(204)"><rect width="140" height="54" rx="16" fill="#22283a" stroke="#404963"/><path d="M23 19l-7 8 7 8M16 27h17" stroke="#55d6a1" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="48" y="33" fill="#e9ecf7">Undo</text></g>
+    <g transform="translate(360)"><rect width="182" height="54" rx="16" fill="#22283a" stroke="#404963"/><path d="M17 21h17l-4-4m4 4-4 4M37 33H20l4 4m-4-4 4-4" stroke="#d497ff" stroke-width="2.2" fill="none" stroke-linecap="round"/><text x="51" y="33" fill="#e9ecf7">Mode Switcher</text></g>
+    <g transform="translate(558)"><rect width="182" height="54" rx="16" fill="#22283a" stroke="#404963"/><rect x="16" y="14" width="24" height="26" rx="5" fill="none" stroke="#72c7ff" stroke-width="2"/><path d="M21 22h14m0 0-4-4m4 4-4 4M35 32H21m0 0 4-4m-4 4 4 4" stroke="#72c7ff" stroke-width="1.8" fill="none"/><text x="52" y="33" fill="#e9ecf7">Chat Transfer</text></g>
+    <g transform="translate(756)"><rect width="174" height="54" rx="16" fill="#22283a" stroke="#404963"/><path d="M17 19h11m8 0h6M17 27h19m6 0h0M17 35h6m8 0h11" stroke="#ff8fa3" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="19" r="3" fill="#ff8fa3"/><circle cx="39" cy="27" r="3" fill="#ff8fa3"/><circle cx="27" cy="35" r="3" fill="#ff8fa3"/><text x="54" y="33" fill="#e9ecf7">Theme Studio</text></g>
+  </g>
+  <rect x="88" y="419" width="926" height="4" rx="2" fill="url(#accent)"/>
+  <text x="88" y="458" fill="#758096" font-family="Segoe UI,Arial,sans-serif" font-size="14">Built for ZadLoop · deterministic offline bundle · MIT licensed</text>
+</svg>
