@@ -1,6 +1,6 @@
 # Architecture
 
-The toolkit is a DSH managed bundle whose `cordis.patch.yml` activates six feature packages. npm `bundledDependencies` embeds those packages and `fflate` inside the one release tarball.
+The toolkit is a DSH managed bundle whose `cordis.patch.yml` activates seven feature packages. npm `bundledDependencies` embeds those packages and `fflate` inside the one release tarball.
 
 ```text
 dsh-zadloop-ultimate-toolkit
@@ -13,9 +13,9 @@ dsh-zadloop-ultimate-toolkit
 └── fflate
 ```
 
-DSH resolves the selected toolkit from the profile, walks its dependency closure, and exposes the child packages to the host and web client module loaders. Each feature keeps its own narrowly scoped host/client lifecycle and CSS namespace.
+DSH resolves the selected toolkit from the profile, walks its dependency closure, and exposes the child packages to the host and web client module loaders. Each feature keeps its own narrowly scoped host/client lifecycle and CSS namespace. Remote Control is the seventh component; it owns an authenticated fixed-target proxy and optional Cloudflare tunnel supervisor.
 
-The auditable Computer Use source lives in `packages/computer-use/`. Its deterministic release archive is stored in `vendor/` and embedded during `npm pack`; the source directory itself is not duplicated inside the final tarball.
+The auditable Computer Use and Remote Control sources live in `packages/computer-use/` and `packages/remote-control/`. Their deterministic release archives are stored in `vendor/` and embedded during `npm pack`; the source directories themselves are not duplicated inside the final tarball.
 
 ## Why a bundle instead of copied source
 
@@ -31,8 +31,8 @@ The test process checks:
 1. The toolkit declares a valid `dsh.bundle.patch`.
 2. Every feature row appears exactly once.
 3. Every deterministic vendor archive is present.
-4. `npm pack` embeds all seven dependencies.
+4. `npm pack` embeds all eight dependencies.
 5. An offline pnpm install from only the toolkit tarball succeeds.
-6. DSH runtime resolution discovers all six feature packages.
+6. DSH runtime resolution discovers all seven feature packages.
 7. A separate web-profile smoke host binds successfully on a random loopback port.
 8. A read-only Windows smoke captures a scaled desktop screenshot and verifies its coordinate metadata.

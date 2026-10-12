@@ -1,5 +1,16 @@
 # Workflow examples
 
+## Open ZadLoop securely from another device
+
+1. Click **Remote** in the conversation dock.
+2. Select **LAN / IP** for devices on the same network, **Quick Tunnel** for a temporary internet URL, or **Custom domain** for an existing Cloudflare named tunnel.
+3. Enter a passphrase of at least 12 characters and choose the session lifetime.
+4. Click **Save & start**, then copy the displayed URL to the other device.
+5. Sign in with the remote passphrase. The browser receives the complete ZadLoop interface.
+6. Back on the host, use **Revoke sessions** to disconnect browsers or **Stop remote access** to close the listener and tunnel.
+
+Use **Local browser** when access should stay on the host PC. It is the only mode that permits passwordless operation.
+
 ## Let the agent operate a desktop application
 
 1. Select a model that supports image input.

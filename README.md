@@ -3,16 +3,16 @@
 
   # ZadLoop Ultimate Toolkit
 
-  **One tarball. Six integrated tools. No plugin hunting.**
+  **One tarball. Seven integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-1.2.0-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-1.3.0-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
   [![CI](https://img.shields.io/github/actions/workflow/status/Lucifer-xD/zadloop-ultimate-toolkit/ci.yml?style=flat-square&label=tests)](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/actions/workflows/ci.yml)
 </div>
 
-ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Undo, live session mode switching, full chat transfer, and Theme Studio into **one self-contained plugin file**. Its dependencies are bundled inside the release, so your friends install a single `.tgz` rather than finding separate packages.
+ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Context Surgery, same-session Undo, live session mode switching, full chat transfer, and Theme Studio into **one self-contained plugin file**. Its dependencies are bundled inside the release, so your friends install a single `.tgz` rather than finding separate packages.
 
 > Community project. Not affiliated with or endorsed by DeepSeek or ZadLoop.
 
@@ -20,6 +20,7 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 | Feature | What it does | Included version |
 |---|---|---:|
+| Remote Control | Open the complete ZadLoop interface from another browser over local-only, LAN/IP, Cloudflare Quick Tunnel, or a custom Cloudflare domain | 2.0.0 |
 | Computer Use | Let a vision-capable agent manage its own access and operate the visible Windows desktop with screenshots, mouse, keyboard, scrolling, and an expiring timer | 1.1.1 |
 | Context Surgery | Edit reply text, edit reasoning separately, remove messages from future model context, and use `/context` commands | 0.1.2 fixed-v4 |
 | Same-session Undo | Remove one user/assistant exchange from the transcript and future context without creating a new session | 1.5.1 |
@@ -34,12 +35,13 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-1.2.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.2.0.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-1.3.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.3.0.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
    - `dsh-zadloop-mode-switcher`
    - `dsh-zadloop-computer-use`
+   - `dsh-zadloop-remote-control`
    - `dsh-zadloop-theme-studio`
    - `dsh-zadloop-session-transfer`
 3. Open **Plugins → Add plugin → Tarball**.
@@ -50,12 +52,27 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.2.0.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.3.0.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.
 
 ## Feature guide
+
+### Remote Control
+
+Open **Remote** in the bottom dock and choose one connection mode:
+
+- **Local browser** listens only on `127.0.0.1`; a password is optional.
+- **LAN / IP** makes ZadLoop available to devices on the same network and requires a passphrase.
+- **Quick Tunnel** creates a temporary `trycloudflare.com` address and requires a passphrase.
+- **Custom domain** runs an existing Cloudflare named tunnel using its UUID, hostname, and credentials file.
+
+Click **Save & start**, then copy the live URL. A signed-in remote browser receives the complete ZadLoop interface: chats, settings, plugins, Theme Studio, transfer, mode switching, and agent tools. The toolbar shows active sessions; **Revoke sessions** disconnects them immediately and **Stop remote access** closes the listener and tunnel.
+
+Remote access is off after first installation. Passphrases are stored only as salted scrypt hashes. Network modes cannot be started without one, login attempts are rate-limited, and the private local ZadLoop browser credential is never sent to a visitor. Quick/custom tunnel modes bind only to loopback; LAN mode does not create a firewall rule automatically.
+
+![Remote Control setup panel](docs/images/remote-control.svg)
 
 ### Computer Use
 
@@ -133,6 +150,7 @@ See [examples/WORKFLOWS.md](examples/WORKFLOWS.md) for complete workflows:
 ## Safety and privacy
 
 - No telemetry is added by this toolkit.
+- Remote Control is disabled by default, requires authentication for every network/tunnel mode, supports expiring/revocable sessions, and never exposes ZadLoop's private upstream cookie.
 - Session Transfer writes only to local ZadLoop session/attachment storage.
 - Imported archives are checked for traversal paths, encryption, ZIP64, entry count, compressed size, expanded size, valid JSONL, contiguous event sequences, duplicate session IDs, and attachment integrity.
 - Context edits and Undo are append-only. They change the model-visible surface rather than erasing the durable log.
@@ -160,7 +178,7 @@ npm run check
 npm pack
 ```
 
-The release package uses npm `bundledDependencies`. The `vendor/` archives make builds deterministic and keep installation offline. The complete Computer Use source, Windows worker, client panel, and tests live in [`packages/computer-use`](packages/computer-use/).
+The release package uses npm `bundledDependencies`. The `vendor/` archives make builds deterministic and keep installation offline. The complete Computer Use and Remote Control sources, client panels, and tests live in [`packages/computer-use`](packages/computer-use/) and [`packages/remote-control`](packages/remote-control/).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md).
 

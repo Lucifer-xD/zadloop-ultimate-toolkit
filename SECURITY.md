@@ -13,3 +13,7 @@ For a suspected vulnerability, open a private GitHub security advisory for this 
 - Computer Use starts paused, grants expire after at most 120 minutes, grants are never persisted, and pausing terminates in-flight automation.
 - Computer Use can interact with anything visible in the signed-in Windows desktop. Keep sensitive applications closed, supervise consequential actions, and never arm it for an untrusted prompt or session.
 - Computer Use does not expose arbitrary shell execution, network access, or clipboard reads; it is limited to screenshots, cursor movement, mouse buttons, scrolling, Unicode typing, documented key chords, and waiting.
+- Remote Control is disabled by default. Passwordless access is accepted only on loopback; LAN and Cloudflare modes require a 12+ character passphrase.
+- Remote passphrases are stored as salted scrypt hashes. Browser sessions expire, can be revoked, and are rate-limited at login.
+- A remote browser receives the full ZadLoop operator interface and therefore inherits every capability enabled in ZadLoop, including Computer Use. Share its URL and passphrase only with trusted operators.
+- Quick and named Cloudflare tunnels bind the Remote Control listener to loopback. LAN mode binds to all interfaces but does not automatically alter Windows Firewall or router settings.

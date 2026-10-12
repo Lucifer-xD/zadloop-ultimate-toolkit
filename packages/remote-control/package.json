@@ -1,0 +1,31 @@
+{
+  "name": "dsh-zadloop-remote-control",
+  "version": "2.0.0",
+  "description": "Authenticated full-interface remote access for ZadLoop over loopback, LAN, Cloudflare Quick Tunnels, or a custom Cloudflare domain.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib/", "cordis.patch.yml", "README.md", "LICENSE"],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "inject": ["@deepseek-ai/dsh-client-ui-slots"],
+      "immediately": true
+    }
+  },
+  "scripts": {
+    "check": "node --check lib/index.js && node --check lib/proxy.js && node --check lib/tunnel.js && node --check lib/supervisor.js && node --check lib/client.js",
+    "test": "node --test test/*.test.js",
+    "prepublishOnly": "npm run check && npm test"
+  },
+  "engines": { "node": ">=22.19.0" },
+  "keywords": ["zadloop", "dsh", "remote-control", "cloudflare-tunnel", "lan", "self-hosted"],
+  "license": "MIT",
+  "author": "Lucifer-xD"
+}

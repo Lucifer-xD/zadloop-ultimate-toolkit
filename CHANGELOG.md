@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 — 2026-10-12
+
+- Adds authenticated full-interface Remote Control 2.0.0.
+- Adds Local browser, LAN/IP, Cloudflare Quick Tunnel, and Cloudflare custom-domain modes.
+- Adds a native **Remote** dock panel with live URLs, tunnel state, session count, session revocation, and one-click stop.
+- Stores passphrases as salted scrypt hashes, rate-limits login attempts, isolates ZadLoop's upstream browser credential, and forbids passwordless network exposure.
+- Preserves HTTP streaming and WebSocket transport so the complete ZadLoop interface works remotely.
+
 ## 1.2.0 — 2026-10-12
 
 - Adds the agent-facing `computer_access` tool for status, enable, and pause operations.
