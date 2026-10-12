@@ -1,6 +1,6 @@
 {
   "name": "dsh-zadloop-computer-use",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Safe, observable Windows computer control for ZadLoop agents with screenshots, mouse, keyboard, and an expiring arm switch.",
   "type": "module",
   "main": "lib/index.js",
@@ -27,14 +27,6 @@
         "@deepseek-ai/dsh-client-ui-slots"
       ],
       "immediately": true
-    }
-  },
-  "peerDependencies": {
-    "@deepseek-ai/dsh-tools": "*"
-  },
-  "peerDependenciesMeta": {
-    "@deepseek-ai/dsh-tools": {
-      "optional": true
     }
   },
   "scripts": {

@@ -5,8 +5,6 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { defineTool } from "@deepseek-ai/dsh-tools";
-
 export const name = "zadloop-computer-use";
 export const inject = ["tools", "systemPrompt", "connection"];
 
@@ -225,77 +223,83 @@ function actionSummary(args) {
 
 const IMAGE_SCHEMA = {
   type: "object",
-  required: true,
   additionalProperties: false,
+  required: ["attachmentId", "mediaType", "bytes", "width", "height"],
   properties: {
-    attachmentId: { type: "string", required: true },
-    mediaType: { type: "string", required: true },
-    bytes: { type: "integer", required: true },
-    width: { type: "integer", required: true },
-    height: { type: "integer", required: true },
+    attachmentId: { type: "string" },
+    mediaType: { type: "string" },
+    bytes: { type: "integer" },
+    width: { type: "integer" },
+    height: { type: "integer" },
     name: { type: "string" },
     originalDimensions: {
       type: "object",
       additionalProperties: false,
+      required: ["width", "height"],
       properties: {
-        width: { type: "integer", required: true },
-        height: { type: "integer", required: true },
+        width: { type: "integer" },
+        height: { type: "integer" },
       },
     },
   },
 };
 
 function createComputerTool(ctx, controller) {
-  return defineTool({
+  return {
     name: "computer",
     description: "Control the visible Windows desktop and receive a fresh screenshot after every action. Coordinates always refer to the most recent returned screenshot, including multi-monitor desktops. Use screenshot before the first interaction, inspect the result after every action, and never guess coordinates. Computer control must be armed by the user from the ZadLoop toolbar.",
     parameters: {
-      action: {
-        type: "string",
-        required: true,
-        enum: [...ACTIONS],
-        description: "Desktop action to perform.",
+      type: "object",
+      additionalProperties: false,
+      required: ["action"],
+      properties: {
+        action: {
+          type: "string",
+          enum: [...ACTIONS],
+          description: "Desktop action to perform.",
+        },
+        x: { type: "integer", description: "Screenshot-relative x coordinate." },
+        y: { type: "integer", description: "Screenshot-relative y coordinate." },
+        x2: { type: "integer", description: "Screenshot-relative drag destination x coordinate." },
+        y2: { type: "integer", description: "Screenshot-relative drag destination y coordinate." },
+        deltaX: { type: "integer", description: "Horizontal scroll amount. Negative scrolls left; positive scrolls right." },
+        deltaY: { type: "integer", description: "Vertical scroll amount. Negative scrolls down; positive scrolls up." },
+        text: { type: "string", description: "Unicode text to type into the focused control." },
+        keys: { type: "string", description: "Key or chord such as ENTER, CTRL+L, ALT+TAB, WIN+R, or CTRL+SHIFT+P." },
+        durationMs: { type: "integer", description: "Wait duration, or optional drag duration." },
+        settleMs: { type: "integer", description: "Delay after an interaction before taking the screenshot (default 250 ms)." },
       },
-      x: { type: "integer", description: "Screenshot-relative x coordinate." },
-      y: { type: "integer", description: "Screenshot-relative y coordinate." },
-      x2: { type: "integer", description: "Screenshot-relative drag destination x coordinate." },
-      y2: { type: "integer", description: "Screenshot-relative drag destination y coordinate." },
-      deltaX: { type: "integer", description: "Horizontal scroll amount. Negative scrolls left; positive scrolls right." },
-      deltaY: { type: "integer", description: "Vertical scroll amount. Negative scrolls down; positive scrolls up." },
-      text: { type: "string", description: "Unicode text to type into the focused control." },
-      keys: { type: "string", description: "Key or chord such as ENTER, CTRL+L, ALT+TAB, WIN+R, or CTRL+SHIFT+P." },
-      durationMs: { type: "integer", description: "Wait duration, or optional drag duration." },
-      settleMs: { type: "integer", description: "Delay after an interaction before taking the screenshot (default 250 ms)." },
     },
     output: {
       schema: {
         type: "object",
         additionalProperties: false,
+        required: ["action", "summary", "screen", "cursor", "image"],
         properties: {
-          action: { type: "string", required: true },
-          summary: { type: "string", required: true },
+          action: { type: "string" },
+          summary: { type: "string" },
           screen: {
             type: "object",
-            required: true,
             additionalProperties: false,
+            required: ["originX", "originY", "desktopWidth", "desktopHeight", "screenshotWidth", "screenshotHeight", "scaleX", "scaleY"],
             properties: {
-              originX: { type: "integer", required: true },
-              originY: { type: "integer", required: true },
-              desktopWidth: { type: "integer", required: true },
-              desktopHeight: { type: "integer", required: true },
-              screenshotWidth: { type: "integer", required: true },
-              screenshotHeight: { type: "integer", required: true },
-              scaleX: { type: "number", required: true },
-              scaleY: { type: "number", required: true },
+              originX: { type: "integer" },
+              originY: { type: "integer" },
+              desktopWidth: { type: "integer" },
+              desktopHeight: { type: "integer" },
+              screenshotWidth: { type: "integer" },
+              screenshotHeight: { type: "integer" },
+              scaleX: { type: "number" },
+              scaleY: { type: "number" },
             },
           },
           cursor: {
             type: "object",
-            required: true,
             additionalProperties: false,
+            required: ["x", "y"],
             properties: {
-              x: { type: "integer", required: true },
-              y: { type: "integer", required: true },
+              x: { type: "integer" },
+              y: { type: "integer" },
             },
           },
           image: IMAGE_SCHEMA,
@@ -321,18 +325,25 @@ function createComputerTool(ctx, controller) {
         image: imageValue(ref),
       };
     },
-    presentCall: (args) => ({
-      card: "generic",
-      title: "Computer",
-      kind: "execute",
-      content: [{ type: "text", text: actionSummary(args) }],
-    }),
+    presentCall: (rawArgs) => {
+      try {
+        const args = validateComputerAction(rawArgs);
+        return {
+          card: "generic",
+          title: "Computer",
+          kind: "execute",
+          content: [{ type: "text", text: actionSummary(args) }],
+        };
+      } catch {
+        return undefined;
+      }
+    },
     presentResult: (_args, result) => {
       const value = result.value;
       if (!value || result.isError) return undefined;
       return { card: "generic", content: [{ type: "text", text: `${value.summary} · ${value.screen.screenshotWidth}×${value.screen.screenshotHeight}` }] };
     },
-  });
+  };
 }
 
 function stateRoute(controller) {

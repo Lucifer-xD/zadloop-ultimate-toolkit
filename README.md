@@ -5,7 +5,7 @@
 
   **One tarball. Six integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-1.1.0-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-1.1.1-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
@@ -20,7 +20,7 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 | Feature | What it does | Included version |
 |---|---|---:|
-| Computer Use | Let a vision-capable agent see and operate the visible Windows desktop with screenshots, mouse, keyboard, scrolling, and an expiring arm switch | 1.0.1 |
+| Computer Use | Let a vision-capable agent see and operate the visible Windows desktop with screenshots, mouse, keyboard, scrolling, and an expiring arm switch | 1.0.2 |
 | Context Surgery | Edit reply text, edit reasoning separately, remove messages from future model context, and use `/context` commands | 0.1.2 fixed-v4 |
 | Same-session Undo | Remove one user/assistant exchange from the transcript and future context without creating a new session | 1.5.1 |
 | Mode Switcher | Change the **current session** between Standard and Delegate mode | 2.0.3 |
@@ -34,7 +34,7 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-1.1.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.1.0.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-1.1.1.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.1.1.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
@@ -50,7 +50,7 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.1.0.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.1.1.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.

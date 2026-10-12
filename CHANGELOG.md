@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 — 2026-10-12
+
+- Fixes Computer Use activation in ZadLoop's live plugin loader.
+- Removes the activation-time dependency on ZadLoop's internal `dsh-tools` package and registers the tool through the stable native contract.
+- Keeps the same guarded screenshot, mouse, keyboard, and emergency-pause behavior.
+
 ## 1.1.0 — 2026-10-12
 
 - Adds Computer Use 1.0.1 to the all-in-one bundle.

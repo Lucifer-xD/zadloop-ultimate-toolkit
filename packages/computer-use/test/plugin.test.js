@@ -50,5 +50,7 @@ test("plugin registers its authenticated state route and one computer tool", () 
   assert.deepEqual(routes[0].methods, ["GET", "POST"]);
   assert.equal(tools.length, 1);
   assert.equal(tools[0].name, "computer");
+  assert.deepEqual(tools[0].parameters.required, ["action"]);
   assert.equal(tools[0].parameters.properties.action.enum.includes("screenshot"), true);
+  assert.equal(tools[0].output.schema.required.includes("image"), true);
 });
