@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 — 2026-10-12
+
+- Adds the agent-facing `computer_access` tool for status, enable, and pause operations.
+- Allows the agent to enable Computer Use automatically for requested desktop tasks instead of asking the user to arm it.
+- Keeps the toolbar timer, live status, expiry, and immediate in-flight action cancellation.
+
 ## 1.1.1 — 2026-10-12
 
 - Fixes Computer Use activation in ZadLoop's live plugin loader.

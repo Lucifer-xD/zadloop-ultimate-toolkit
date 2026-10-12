@@ -14,7 +14,7 @@ Windows desktop control for ZadLoop agents. The model receives a fresh screensho
 
 ## Safety
 
-Computer control starts paused. Open **Computer** in the composer dock and arm it for 15–120 minutes. The toolbar always shows the armed state, the grant expires automatically, and **Pause now** terminates in-flight automation. The package exposes only fixed mouse, keyboard, screenshot, and wait operations—never an arbitrary shell command.
+Computer control starts paused, and the agent can enable, inspect, or pause it through the `computer_access` tool whenever a requested task needs the visible desktop. The **Computer** panel remains available for manual status and control, grants expire automatically, and **Pause now** terminates in-flight automation. The package exposes only fixed mouse, keyboard, screenshot, and wait operations—never an arbitrary shell command.
 
 Use a vision-capable model. Keep sensitive applications closed, supervise consequential work, and pause control before entering passwords or payment information.
 

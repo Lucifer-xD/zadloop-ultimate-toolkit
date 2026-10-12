@@ -1,6 +1,6 @@
 {
   "name": "dsh-zadloop-ultimate-toolkit",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "One-install ZadLoop toolkit: computer use, Context Surgery, Undo, mode switching, session transfer, and 70 modern themes.",
   "type": "module",
   "main": "lib/index.js",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@wasd258/dsh-context-surgery": "file:vendor/wasd258-dsh-context-surgery-0.1.2-zadloop-fixed-v4.tgz",
     "dsh-zadloop-mode-switcher": "file:vendor/dsh-zadloop-mode-switcher-2.0.3.tgz",
-    "dsh-zadloop-computer-use": "file:vendor/dsh-zadloop-computer-use-1.0.2.tgz",
+    "dsh-zadloop-computer-use": "file:vendor/dsh-zadloop-computer-use-1.1.1.tgz",
     "dsh-zadloop-session-transfer": "file:vendor/dsh-zadloop-session-transfer-1.0.2.tgz",
     "dsh-zadloop-theme-studio": "file:vendor/dsh-zadloop-theme-studio-5.0.3.tgz",
     "dsh-zadloop-undo": "file:vendor/dsh-zadloop-undo-1.5.1.tgz",

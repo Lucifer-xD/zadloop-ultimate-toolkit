@@ -5,7 +5,7 @@
 
   **One tarball. Six integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-1.1.1-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-1.2.0-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
@@ -20,7 +20,7 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 | Feature | What it does | Included version |
 |---|---|---:|
-| Computer Use | Let a vision-capable agent see and operate the visible Windows desktop with screenshots, mouse, keyboard, scrolling, and an expiring arm switch | 1.0.2 |
+| Computer Use | Let a vision-capable agent manage its own access and operate the visible Windows desktop with screenshots, mouse, keyboard, scrolling, and an expiring timer | 1.1.1 |
 | Context Surgery | Edit reply text, edit reasoning separately, remove messages from future model context, and use `/context` commands | 0.1.2 fixed-v4 |
 | Same-session Undo | Remove one user/assistant exchange from the transcript and future context without creating a new session | 1.5.1 |
 | Mode Switcher | Change the **current session** between Standard and Delegate mode | 2.0.3 |
@@ -34,7 +34,7 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-1.1.1.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.1.1.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-1.2.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.2.0.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
@@ -50,7 +50,7 @@ ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Un
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.1.1.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.2.0.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.
@@ -59,7 +59,7 @@ Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package
 
 ### Computer Use
 
-Open **Computer** in the bottom dock and choose **Arm computer control**. It starts paused, can be armed for 15, 30, 60, or 120 minutes, expires automatically, and can be stopped immediately with **Pause now**.
+Ask for a desktop task naturally. The agent uses `computer_access` to enable control when needed, operates through screenshots, then can pause access when finished. **Computer** in the bottom dock still provides live status, manual 15–120 minute controls, and **Pause now** for terminating an in-flight action.
 
 Then ask naturally, for example:
 
@@ -137,8 +137,8 @@ See [examples/WORKFLOWS.md](examples/WORKFLOWS.md) for complete workflows:
 - Imported archives are checked for traversal paths, encryption, ZIP64, entry count, compressed size, expanded size, valid JSONL, contiguous event sequences, duplicate session IDs, and attachment integrity.
 - Context edits and Undo are append-only. They change the model-visible surface rather than erasing the durable log.
 - Context Surgery exposes loopback-only local API routes. Any trusted local process can reach loopback, so use ZadLoop on a trusted machine.
-- Computer Use is Windows-only, starts paused after every host start or plugin reload, never persists an arm grant, and exposes fixed desktop actions rather than arbitrary command execution.
-- Pausing Computer Use terminates an in-flight desktop action. Its screenshots are stored by ZadLoop as normal session attachments so the model can inspect them.
+- Computer Use is Windows-only, starts paused after every host start or plugin reload, never persists an access grant, and exposes fixed desktop actions rather than arbitrary command execution.
+- The agent may enable or pause Computer Use through `computer_access`. Manual **Pause now** terminates an in-flight desktop action, while screenshots are stored by ZadLoop as normal session attachments for inspection.
 
 ## Compatibility
 

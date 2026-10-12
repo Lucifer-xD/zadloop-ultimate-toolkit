@@ -81,7 +81,7 @@ export class ArmController {
     return {
       ok: true,
       enabled: this.armedUntil > now,
-      armedUntil: this.armedUntil || null,
+      ...(this.armedUntil > now ? { armedUntil: this.armedUntil } : {}),
       remainingMs: Math.max(0, this.armedUntil - now),
       platform: process.platform,
       capabilities: ["screenshot", "cursor", "move", "click", "double_click", "right_click", "drag", "scroll", "type", "keypress", "wait"],
@@ -105,7 +105,7 @@ export class ArmController {
 
   assertEnabled() {
     const state = this.snapshot();
-    if (!state.enabled) throw new Error("Computer use is paused. Open Computer in the ZadLoop toolbar and arm it before retrying.");
+    if (!state.enabled) throw new Error("Computer use is paused. Call computer_access with operation enable, then retry.");
     return this.generation;
   }
 
@@ -247,7 +247,7 @@ const IMAGE_SCHEMA = {
 function createComputerTool(ctx, controller) {
   return {
     name: "computer",
-    description: "Control the visible Windows desktop and receive a fresh screenshot after every action. Coordinates always refer to the most recent returned screenshot, including multi-monitor desktops. Use screenshot before the first interaction, inspect the result after every action, and never guess coordinates. Computer control must be armed by the user from the ZadLoop toolbar.",
+    description: "Control the visible Windows desktop and receive a fresh screenshot after every action. Coordinates always refer to the most recent returned screenshot, including multi-monitor desktops. Use computer_access to enable control when paused, start with screenshot, inspect the result after every action, and never guess coordinates.",
     parameters: {
       type: "object",
       additionalProperties: false,
@@ -346,6 +346,69 @@ function createComputerTool(ctx, controller) {
   };
 }
 
+const ACCESS_STATE_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["ok", "enabled", "remainingMs", "platform", "capabilities"],
+  properties: {
+    ok: { type: "boolean" },
+    enabled: { type: "boolean" },
+    armedUntil: { type: "integer" },
+    remainingMs: { type: "integer" },
+    platform: { type: "string" },
+    capabilities: { type: "array", items: { type: "string" } },
+  },
+};
+
+export function validateComputerAccess(input) {
+  if (input === null || typeof input !== "object" || Array.isArray(input)) throw new Error("computer access request must be an object.");
+  if (!["status", "enable", "disable"].includes(input.operation)) throw new Error("operation must be status, enable, or disable.");
+  const result = { operation: input.operation };
+  if (input.operation === "enable") {
+    result.minutes = input.minutes === undefined ? 30 : finiteInteger(input.minutes, "minutes", { min: 5, max: 120 });
+  }
+  return result;
+}
+
+function createComputerAccessTool(controller) {
+  return {
+    name: "computer_access",
+    description: "Check, enable, or pause Windows computer control. You are allowed to enable access yourself when a requested task needs the computer; do not ask the user to arm it. Enable access before calling computer if it is paused, and disable it when desktop work is finished.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["operation"],
+      properties: {
+        operation: { type: "string", enum: ["status", "enable", "disable"], description: "Access operation to perform." },
+        minutes: { type: "integer", minimum: 5, maximum: 120, description: "Enable duration in minutes (default 30)." },
+      },
+    },
+    output: {
+      schema: ACCESS_STATE_SCHEMA,
+      render: (_args, value) => [{ type: "text", text: value.enabled ? `Computer access enabled for ${Math.ceil(value.remainingMs / 60_000)} minutes.` : "Computer access paused." }],
+    },
+    async execute(rawArgs) {
+      const args = validateComputerAccess(rawArgs);
+      if (args.operation === "enable") return controller.enable(args.minutes);
+      if (args.operation === "disable") return controller.disable();
+      return controller.snapshot();
+    },
+    presentCall: (rawArgs) => {
+      try {
+        const args = validateComputerAccess(rawArgs);
+        return { card: "generic", title: "Computer access", kind: "execute", content: [{ type: "text", text: args.operation }] };
+      } catch {
+        return undefined;
+      }
+    },
+    presentResult: (_args, result) => {
+      const value = result.value;
+      if (!value || result.isError) return undefined;
+      return { card: "generic", content: [{ type: "text", text: value.enabled ? "Enabled" : "Paused" }] };
+    },
+  };
+}
+
 function stateRoute(controller) {
   return {
     path: STATE_PATH,
@@ -374,10 +437,11 @@ export function apply(ctx) {
   const controller = new ArmController();
   ctx.effect(() => ctx.connection.fetch.register(stateRoute(controller)), "zadloop-computer-use: arm state route");
   ctx.effect(() => () => controller.disable(), "zadloop-computer-use: stop actions on dispose");
+  ctx.effect(() => ctx.tools.register(createComputerAccessTool(controller)), "zadloop-computer-use: agent access control tool");
   ctx.systemPrompt.section({
     name: "tool:computer",
     order: ctx.systemPrompt.getSectionOrder?.("TOOL_COMPUTER") ?? 5_000,
-    text: "The computer tool controls the user's visible Windows desktop. It is paused until the user explicitly arms it in the Computer toolbar panel. Start with screenshot, use only coordinates from the latest screenshot, inspect every returned screenshot, and stop before consequential or sensitive actions unless the user clearly requested them.",
+    text: "The computer tool controls the user's visible Windows desktop. You may manage its access yourself with computer_access: call status when useful, enable it without asking the user whenever their requested task needs desktop control, and disable it when desktop work is finished. Start with screenshot, use only coordinates from the latest screenshot, inspect every returned screenshot, and stop before consequential or sensitive actions unless the user clearly requested them.",
   });
   ctx.inject(["attachments"], (imageCtx) => imageCtx.tools.register(createComputerTool(imageCtx, controller)));
 }

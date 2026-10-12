@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { apply, ArmController, validateComputerAction } from "../lib/index.js";
+import { apply, ArmController, validateComputerAccess, validateComputerAction } from "../lib/index.js";
 
 test("arm grants expire and pause increments the generation", () => {
   let now = 1_000;
@@ -25,6 +25,13 @@ test("action validation accepts complete operations and rejects missing fields",
   assert.throws(() => validateComputerAction({ action: "launch", text: "calc" }), /unsupported action/);
 });
 
+test("agent access validation applies a safe default and rejects invalid durations", () => {
+  assert.deepEqual(validateComputerAccess({ operation: "enable" }), { operation: "enable", minutes: 30 });
+  assert.deepEqual(validateComputerAccess({ operation: "disable" }), { operation: "disable" });
+  assert.throws(() => validateComputerAccess({ operation: "enable", minutes: 2 }), /minutes/);
+  assert.throws(() => validateComputerAccess({ operation: "takeover" }), /operation/);
+});
+
 test("PowerShell worker contains no arbitrary command evaluation", async () => {
   const source = await readFile(new URL("../scripts/computer-use.ps1", import.meta.url), "utf8");
   for (const forbidden of ["Invoke-Expression", "iex ", "Start-Process", "cmd.exe", "-Command"]) {
@@ -32,7 +39,7 @@ test("PowerShell worker contains no arbitrary command evaluation", async () => {
   }
 });
 
-test("plugin registers its authenticated state route and one computer tool", () => {
+test("plugin registers its authenticated state route and agent-managed computer tools", async () => {
   const routes = [];
   const tools = [];
   const ctx = {
@@ -48,9 +55,15 @@ test("plugin registers its authenticated state route and one computer tool", () 
   apply(ctx);
   assert.equal(routes.length, 1);
   assert.deepEqual(routes[0].methods, ["GET", "POST"]);
-  assert.equal(tools.length, 1);
-  assert.equal(tools[0].name, "computer");
-  assert.deepEqual(tools[0].parameters.required, ["action"]);
-  assert.equal(tools[0].parameters.properties.action.enum.includes("screenshot"), true);
-  assert.equal(tools[0].output.schema.required.includes("image"), true);
+  assert.equal(tools.length, 2);
+  const accessTool = tools.find((tool) => tool.name === "computer_access");
+  const computerTool = tools.find((tool) => tool.name === "computer");
+  assert.ok(accessTool);
+  assert.ok(computerTool);
+  assert.deepEqual(computerTool.parameters.required, ["action"]);
+  assert.equal(computerTool.parameters.properties.action.enum.includes("screenshot"), true);
+  assert.equal(computerTool.output.schema.required.includes("image"), true);
+  assert.equal((await accessTool.execute({ operation: "status" })).enabled, false);
+  assert.equal((await accessTool.execute({ operation: "enable", minutes: 5 })).enabled, true);
+  assert.equal((await accessTool.execute({ operation: "disable" })).enabled, false);
 });
