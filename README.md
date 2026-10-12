@@ -3,16 +3,16 @@
 
   # ZadLoop Ultimate Toolkit
 
-  **One tarball. Six power features. No plugin hunting.**
+  **One tarball. Six integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-1.0.0-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-1.1.0-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
   [![CI](https://img.shields.io/github/actions/workflow/status/Lucifer-xD/zadloop-ultimate-toolkit/ci.yml?style=flat-square&label=tests)](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/actions/workflows/ci.yml)
 </div>
 
-ZadLoop Ultimate Toolkit packages Context Surgery, same-session Undo, live session mode switching, full chat transfer, and Theme Studio into **one self-contained plugin file**. Its dependencies are bundled inside the release, so your friends install a single `.tgz` rather than finding five separate packages.
+ZadLoop Ultimate Toolkit packages Computer Use, Context Surgery, same-session Undo, live session mode switching, full chat transfer, and Theme Studio into **one self-contained plugin file**. Its dependencies are bundled inside the release, so your friends install a single `.tgz` rather than finding separate packages.
 
 > Community project. Not affiliated with or endorsed by DeepSeek or ZadLoop.
 
@@ -20,6 +20,7 @@ ZadLoop Ultimate Toolkit packages Context Surgery, same-session Undo, live sessi
 
 | Feature | What it does | Included version |
 |---|---|---:|
+| Computer Use | Let a vision-capable agent see and operate the visible Windows desktop with screenshots, mouse, keyboard, scrolling, and an expiring arm switch | 1.0.1 |
 | Context Surgery | Edit reply text, edit reasoning separately, remove messages from future model context, and use `/context` commands | 0.1.2 fixed-v4 |
 | Same-session Undo | Remove one user/assistant exchange from the transcript and future context without creating a new session | 1.5.1 |
 | Mode Switcher | Change the **current session** between Standard and Delegate mode | 2.0.3 |
@@ -33,11 +34,12 @@ ZadLoop Ultimate Toolkit packages Context Surgery, same-session Undo, live sessi
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-1.0.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.0.0.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-1.1.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.1.0.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
    - `dsh-zadloop-mode-switcher`
+   - `dsh-zadloop-computer-use`
    - `dsh-zadloop-theme-studio`
    - `dsh-zadloop-session-transfer`
 3. Open **Plugins → Add plugin → Tarball**.
@@ -48,12 +50,28 @@ ZadLoop Ultimate Toolkit packages Context Surgery, same-session Undo, live sessi
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.0.0.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.1.0.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.
 
 ## Feature guide
+
+### Computer Use
+
+Open **Computer** in the bottom dock and choose **Arm computer control**. It starts paused, can be armed for 15, 30, 60, or 120 minutes, expires automatically, and can be stopped immediately with **Pause now**.
+
+Then ask naturally, for example:
+
+- “Open Settings and enable Night light.”
+- “Use the browser to download my latest invoice.”
+- “Open this spreadsheet and sort the table by date.”
+
+The model receives a new screenshot after every action and can move, click, double-click, right-click, drag, scroll, type Unicode text, and press shortcuts such as `CTRL+L` or `ALT+TAB`. Coordinates remain accurate on scaled and multi-monitor desktops.
+
+![Computer Use control center](docs/images/computer-use.svg)
+
+Use a vision-capable model. Supervise consequential work and pause before passwords, payments, account changes, or other sensitive actions.
 
 ### Context Surgery
 
@@ -119,6 +137,8 @@ See [examples/WORKFLOWS.md](examples/WORKFLOWS.md) for complete workflows:
 - Imported archives are checked for traversal paths, encryption, ZIP64, entry count, compressed size, expanded size, valid JSONL, contiguous event sequences, duplicate session IDs, and attachment integrity.
 - Context edits and Undo are append-only. They change the model-visible surface rather than erasing the durable log.
 - Context Surgery exposes loopback-only local API routes. Any trusted local process can reach loopback, so use ZadLoop on a trusted machine.
+- Computer Use is Windows-only, starts paused after every host start or plugin reload, never persists an arm grant, and exposes fixed desktop actions rather than arbitrary command execution.
+- Pausing Computer Use terminates an in-flight desktop action. Its screenshots are stored by ZadLoop as normal session attachments so the model can inspect them.
 
 ## Compatibility
 
@@ -129,7 +149,7 @@ Validated with:
 - Node.js 22.19 or newer
 - Windows desktop web profile
 
-The clean-profile smoke test installs only this tarball, resolves every bundled feature through DSH's runtime package router, and boots a separate web host on an OS-assigned port.
+The clean-profile smoke test installs only this tarball, resolves every bundled feature through DSH's runtime package router, and boots a separate web host on an OS-assigned port. Computer Use additionally requires Windows and a model route that accepts image input.
 
 ## Development
 
@@ -140,7 +160,7 @@ npm run check
 npm pack
 ```
 
-The release package uses npm `bundledDependencies`. The `vendor/` archives make builds deterministic and keep installation offline.
+The release package uses npm `bundledDependencies`. The `vendor/` archives make builds deterministic and keep installation offline. The complete Computer Use source, Windows worker, client panel, and tests live in [`packages/computer-use`](packages/computer-use/).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md).
 

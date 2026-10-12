@@ -1,5 +1,16 @@
 # Workflow examples
 
+## Let the agent operate a desktop application
+
+1. Select a model that supports image input.
+2. Open **Computer** in the bottom dock.
+3. Choose a short arm duration and select **Arm computer control**.
+4. Ask for the visible task in normal language, such as “Open Settings and enable Night light.”
+5. Watch the agent inspect a screenshot before acting and inspect a fresh screenshot after each action.
+6. Select **Pause now** when the task is complete.
+
+Computer Use deliberately starts paused and does not persist its arm grant across a ZadLoop restart or plugin reload. Pause before entering credentials or approving consequential changes.
+
 ## Correct an answer while preserving its tool history
 
 1. Hover the assistant message action row.

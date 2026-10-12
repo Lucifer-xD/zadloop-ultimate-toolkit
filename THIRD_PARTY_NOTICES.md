@@ -18,4 +18,4 @@ Original project: <https://github.com/101arrowz/fflate>
 
 ## Toolkit components
 
-Theme Studio, Mode Switcher, Session Transfer, and Same-session Undo are distributed under the toolkit's MIT terms. See the package metadata and license files retained inside each bundled dependency.
+Computer Use, Theme Studio, Mode Switcher, Session Transfer, and Same-session Undo are distributed under the toolkit's MIT terms. See the package metadata and license files retained inside each bundled dependency.
