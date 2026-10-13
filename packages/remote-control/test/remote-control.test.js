@@ -128,6 +128,10 @@ test("network proxy requires login, establishes an expiring session, and revokes
   const anonymous = await call(origin, "/api/private");
   assert.equal(anonymous.status, 303);
   assert.match(anonymous.headers.location, /^\/__zadloop_remote__\/login/);
+  const loginPage = await call(origin, anonymous.headers.location);
+  assert.equal(loginPage.status, 200);
+  assert.match(loginPage.body, /backdrop-filter:blur\(38px\) saturate\(1\.6\)/);
+  assert.match(loginPage.body, /@media\(prefers-color-scheme:light\)/);
   const bad = await call(origin, "/__zadloop_remote__/login", { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: "password=wrong&next=%2Fapi%2Fprivate" });
   assert.equal(bad.status, 401);
   const login = await call(origin, "/__zadloop_remote__/login", { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: "password=this+is+a+remote+passphrase&next=%2Fapi%2Fprivate" });
@@ -153,6 +157,18 @@ test("cross-site requests and unauthenticated websocket upgrades are rejected", 
   assert.equal(upgrade.status, 401);
 });
 
+test("cross-site link clicks may reach login but unsafe cross-site requests remain blocked", async (t) => {
+  const passwordRecord = await hashPassphrase("this is a remote passphrase");
+  const { origin } = await fixture(t, { passwordRecord });
+  const navigation = await call(origin, "/", { headers: { "sec-fetch-site": "cross-site", "sec-fetch-mode": "navigate", "sec-fetch-dest": "document" } });
+  assert.equal(navigation.status, 303);
+  assert.match(navigation.headers.location, /^\/__zadloop_remote__\/login/);
+  const unsafe = await call(origin, "/api/private", { method: "POST", headers: { "sec-fetch-site": "cross-site", "sec-fetch-mode": "cors", "sec-fetch-dest": "empty" }, body: "blocked" });
+  assert.equal(unsafe.status, 403);
+  const forged = await call(origin, "/", { headers: { origin: "https://attacker.invalid", "sec-fetch-site": "same-origin" } });
+  assert.equal(forged.status, 403);
+});
+
 test("configuration rejects unsafe passwordless network states and invalid values", () => {
   assert.equal(validateConfiguration({ mode: "local", port: 48911, sessionHours: 8 }).mode, "local");
   assert.equal(validateConfiguration({ mode: "lan", port: 48912, sessionHours: 24 }).port, 48912);
@@ -176,7 +192,7 @@ test("named tunnel config is strict and child environment omits account secrets"
 test("manifest exposes a managed client bundle and stores no credentials", async () => {
   const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
   assert.equal(manifest.name, "dsh-zadloop-remote-control");
-  assert.equal(manifest.version, "2.1.2");
+  assert.equal(manifest.version, "2.2.1");
   assert.equal(manifest.dsh.client.platform, "web");
   const temporary = await mkdtemp(join(tmpdir(), "zrc-test-"));
   await rm(temporary, { recursive: true, force: true });

@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.7.2 — 2026-10-13
+
+- Raises the Remote Control glass panel opacity and overlay contrast so content stays crisp over busy conversations while preserving blur and tonal depth.
+- Ships Remote Control 2.2.1 with a fresh live-client identity for restart-free upgrades.
+
+## 1.7.1 — 2026-10-13
+
+- Gives the redesigned Remote Control and Theme Studio clients versioned bundle identities so ZadLoop can hot-load them over older installations without an application restart.
+
+## 1.7.0 — 2026-10-13
+
+- Redesigns the Remote Control panel and remote login with responsive Liquid Glass surfaces, layered lighting, refined controls, light/dark adaptation, and reduced-motion support.
+- Adds mode-exclusive **Liquid Glass Day** and **Liquid Glass Night** designs to Theme Studio, bringing the library to 51 dark and 21 light themes.
+- Makes Liquid Glass presets configure their complete visual recipe in one click: semantic colors, translucent surfaces, ambient glow, gradients, radius, typography, density, bubbles, code blocks, and controls.
+- Includes the safe Cloudflare cross-site navigation fix from Remote Control 2.1.3 while preserving CSRF protection for unsafe cross-site requests.
+
+## 1.6.2 — 2026-10-13
+
+- Fixes Remote Control rejecting a legitimate Cloudflare link click with `Cross-site requests are not allowed.`
+- Allows only safe cross-site top-level `GET`/`HEAD` document navigation to reach the authenticated login page.
+- Continues to reject cross-site API requests, form submissions, forged origins, and unauthenticated WebSocket upgrades.
+
 ## 1.6.0 — 2026-10-13
 
 - Upgrades Session Transfer to 1.2.0 with explicit, safe reconciliation for sessions that were continued independently on two computers.
