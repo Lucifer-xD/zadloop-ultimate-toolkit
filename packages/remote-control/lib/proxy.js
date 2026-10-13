@@ -138,6 +138,10 @@ export function createRemoteProxy({ upstream, getCookie, passwordRecord, passwor
     return `${url.pathname}${url.search}`;
   }
   function isSameOrigin(req) {
+    const safeNavigation = ["GET", "HEAD"].includes(req.method ?? "")
+      && req.headers["sec-fetch-mode"] === "navigate"
+      && req.headers["sec-fetch-dest"] === "document";
+    if (safeNavigation) return true;
     if (req.headers.origin) {
       try {
         const origin = new URL(req.headers.origin);
@@ -145,10 +149,7 @@ export function createRemoteProxy({ upstream, getCookie, passwordRecord, passwor
       } catch { return false; }
     }
     if (req.headers["sec-fetch-site"] !== "cross-site") return true;
-    const safeNavigation = ["GET", "HEAD"].includes(req.method ?? "")
-      && req.headers["sec-fetch-mode"] === "navigate"
-      && req.headers["sec-fetch-dest"] === "document";
-    return safeNavigation;
+    return false;
   }
   function upstreamHeaders(req, upgrade = false) {
     const headers = filteredHeaders(req.headers);

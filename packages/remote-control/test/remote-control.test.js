@@ -163,8 +163,13 @@ test("cross-site link clicks may reach login but unsafe cross-site requests rema
   const navigation = await call(origin, "/", { headers: { "sec-fetch-site": "cross-site", "sec-fetch-mode": "navigate", "sec-fetch-dest": "document" } });
   assert.equal(navigation.status, 303);
   assert.match(navigation.headers.location, /^\/__zadloop_remote__\/login/);
+  const navigationWithOrigin = await call(origin, "/", { headers: { origin: "https://launcher.invalid", "sec-fetch-site": "cross-site", "sec-fetch-mode": "navigate", "sec-fetch-dest": "document" } });
+  assert.equal(navigationWithOrigin.status, 303);
+  assert.match(navigationWithOrigin.headers.location, /^\/__zadloop_remote__\/login/);
   const unsafe = await call(origin, "/api/private", { method: "POST", headers: { "sec-fetch-site": "cross-site", "sec-fetch-mode": "cors", "sec-fetch-dest": "empty" }, body: "blocked" });
   assert.equal(unsafe.status, 403);
+  const unsafeWithOrigin = await call(origin, "/api/private", { method: "POST", headers: { origin: "https://launcher.invalid", "sec-fetch-site": "cross-site", "sec-fetch-mode": "cors", "sec-fetch-dest": "empty" }, body: "blocked" });
+  assert.equal(unsafeWithOrigin.status, 403);
   const forged = await call(origin, "/", { headers: { origin: "https://attacker.invalid", "sec-fetch-site": "same-origin" } });
   assert.equal(forged.status, 403);
 });
@@ -192,7 +197,7 @@ test("named tunnel config is strict and child environment omits account secrets"
 test("manifest exposes a managed client bundle and stores no credentials", async () => {
   const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
   assert.equal(manifest.name, "dsh-zadloop-remote-control");
-  assert.equal(manifest.version, "2.2.1");
+  assert.equal(manifest.version, "2.2.2");
   assert.equal(manifest.dsh.client.platform, "web");
   const temporary = await mkdtemp(join(tmpdir(), "zrc-test-"));
   await rm(temporary, { recursive: true, force: true });

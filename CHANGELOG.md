@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.3 — 2026-10-13
+
+- Fixes the remaining `Cross-site requests are not allowed.` case for browsers/webviews that attach a foreign `Origin` header to a safe top-level link navigation.
+- Keeps cross-site POST requests, API calls, forged non-navigation origins, and unauthenticated WebSocket upgrades blocked.
+
 ## 1.7.2 — 2026-10-13
 
 - Raises the Remote Control glass panel opacity and overlay contrast so content stays crisp over busy conversations while preserving blur and tonal depth.
