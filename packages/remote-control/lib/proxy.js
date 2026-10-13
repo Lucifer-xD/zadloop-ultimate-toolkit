@@ -185,7 +185,13 @@ export function createRemoteProxy({ upstream, getCookie, passwordRecord, passwor
 
   const server = createServer(async (req, res) => {
     const pathname = req.url?.split("?", 1)[0] ?? "/";
-    if (!isSameOrigin(req)) { send(res, 403, "Cross-site requests are not allowed."); return; }
+    // The login document is intentionally public and read-only. Cloudflare Quick
+    // Tunnels can retain a foreign Origin header while stripping Sec-Fetch-Mode
+    // or Sec-Fetch-Dest, especially when a failed login URL is refreshed. Let the
+    // browser render this one GET route; credentials, API traffic, POSTs and
+    // websocket upgrades continue through the strict origin checks below.
+    const publicLoginDocument = pathname === "/__zadloop_remote__/login" && req.method === "GET";
+    if (!publicLoginDocument && !isSameOrigin(req)) { send(res, 403, "Cross-site requests are not allowed."); return; }
     if (pathname === "/__zadloop_remote__/login") {
       if (req.method === "GET") { const next = safeNext(new URL(req.url, "http://local").searchParams.get("next")); send(res, 200, loginPage("", next)); return; }
       if (req.method !== "POST") { send(res, 405, "Method not allowed."); return; }

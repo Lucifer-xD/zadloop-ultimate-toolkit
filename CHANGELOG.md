@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.0 — 2026-10-14
+
+- Fixes Cloudflare Quick Tunnel login refreshes that retained a foreign `Origin` while omitting browser navigation headers; the public read-only login document now loads while cross-site POST, API, and WebSocket traffic remains blocked.
+- Rebuilds Liquid Glass around Apple’s functional-layer model: a stable content canvas beneath regular glass navigation and clearer floating glass controls.
+- Adds stronger backdrop saturation, refractive rim highlights, adaptive luminous gradients, floating glass dock buttons, a clearer composer, and calmer message/code surfaces.
+
 ## 1.8.1 — 2026-10-14
 
 - Fixes Liquid Glass transparency on the actual nested conversation canvas instead of targeting a non-existent direct child.
