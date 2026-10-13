@@ -1,6 +1,6 @@
 {
   "name": "dsh-zadloop-ultimate-toolkit",
-  "version": "1.7.3",
+  "version": "1.8.1",
   "description": "One-install ZadLoop toolkit: secure remote control, computer use, Context Surgery, Undo, mode switching, session transfer, and 72 modern themes.",
   "type": "module",
   "main": "lib/index.js",
@@ -27,7 +27,7 @@
     "dsh-zadloop-mode-switcher": "file:vendor/dsh-zadloop-mode-switcher-2.0.3.tgz",
     "dsh-zadloop-remote-control-v222": "file:vendor/dsh-zadloop-remote-control-v222-2.2.2.tgz",
     "dsh-zadloop-session-transfer": "file:vendor/dsh-zadloop-session-transfer-1.2.0.tgz",
-    "dsh-zadloop-theme-studio-v5101": "file:vendor/dsh-zadloop-theme-studio-v5101-5.1.0.tgz",
+    "dsh-zadloop-theme-studio-v521": "file:vendor/dsh-zadloop-theme-studio-v521-5.2.1.tgz",
     "dsh-zadloop-undo": "file:vendor/dsh-zadloop-undo-1.5.1.tgz",
     "fflate": "file:vendor/fflate-0.8.3.tgz"
   },
@@ -37,7 +37,7 @@
     "dsh-zadloop-computer-use",
     "dsh-zadloop-remote-control-v222",
     "dsh-zadloop-session-transfer",
-    "dsh-zadloop-theme-studio-v5101",
+    "dsh-zadloop-theme-studio-v521",
     "dsh-zadloop-undo",
     "fflate"
   ],

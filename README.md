@@ -5,7 +5,7 @@
 
   **One tarball. Seven integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-1.7.3-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-1.8.1-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
@@ -26,7 +26,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 | Same-session Undo | Remove one user/assistant exchange from the transcript and future context without creating a new session | 1.5.1 |
 | Mode Switcher | Change the **current session** between Standard and Delegate mode | 2.0.3 |
 | Session Transfer | Export/import, fast-forward-sync, or safely preserve both branches of a forked chat | 1.2.0 |
-| Theme Studio | 51 dark + 21 light mode-exclusive themes, including Liquid Glass Day/Night, detailed controls, and a live preview | 5.1.0 |
+| Theme Studio | 51 dark + 21 light mode-exclusive themes, including genuinely translucent Liquid Glass Day/Night, detailed controls, and a live preview | 5.2.1 |
 | Offline dependencies | Bundled runtime packages, including `fflate`; no npm lookup is required during tarball installation | bundled |
 
 ![Compact toolbar with Themes, Mode, and Transfer](docs/images/toolbar.svg)
@@ -35,7 +35,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-1.7.3.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.7.3.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-1.8.1.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.8.1.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
@@ -52,7 +52,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.7.3.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.8.1.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.
@@ -124,7 +124,7 @@ The compact dock control shows the current and target mode, for example `Standar
 
 ### Theme Studio
 
-Open **Themes** from the bottom dock. Choose from 72 mode-aware presets or tune typography, surfaces, accents, radii, density, shadows, gradients, and chat colors with an always-live preview. **Liquid Glass Day** and **Liquid Glass Night** automatically apply translucent semantic surfaces, layered tonal lighting, larger radii, refined borders, and matching mode-specific colors across the full interface.
+Open **Themes** from the bottom dock. Choose from 72 mode-aware presets or tune typography, surfaces, accents, radii, density, shadows, gradients, and chat colors with an always-live preview. **Liquid Glass Day** and **Liquid Glass Night** now make the app frame, sidebar, composer, code blocks, bubbles, dialogs, and raised controls genuinely translucent, with strong backdrop blur, saturated light passing through, specular edge highlights, layered shadows, and matching mode-specific colors.
 
 ![Theme Studio mockup](docs/images/theme-studio.svg)
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.1 — 2026-10-14
+
+- Fixes Liquid Glass transparency on the actual nested conversation canvas instead of targeting a non-existent direct child.
+- Adds a translucent center glass sheet, softly blurred conversation header, edge lighting, and deeper background color transmission without reducing text clarity.
+
+## 1.8.0 — 2026-10-14
+
+- Rebuilds Liquid Glass as a genuinely translucent full-app material instead of an opaque tinted palette.
+- Adds lower-alpha semantic surfaces, transparent app framing, stronger ambient light fields, backdrop blur and saturation, specular rim highlights, and layered glass shadows.
+- Applies the material consistently to the sidebar, main workspace, composer, bubbles, code blocks, dialogs, raised controls, and Theme Studio preview while keeping text contrast intact.
+
 ## 1.7.3 — 2026-10-13
 
 - Fixes the remaining `Cross-site requests are not allowed.` case for browsers/webviews that attach a foreign `Origin` header to a safe top-level link navigation.
