@@ -107,14 +107,29 @@ window.__ModuleLoader__.load({
         setBusy(true);
         setStatus({ text: `Importing ${file.name} (${formatSize(file.size)})...` });
         try {
-          const response = await fetch(IMPORT_ROUTE, { method: "POST", headers: { "content-type": "application/zip" }, body: file });
-          const result = parseResponse(await response.text(), response.status);
+          const upload = async (route) => {
+            const response = await fetch(route, { method: "POST", headers: { "content-type": "application/zip" }, body: file });
+            return { response, result: parseResponse(await response.text(), response.status) };
+          };
+          let { response, result } = await upload(IMPORT_ROUTE);
+          if (response.status === 409 && result.code === "session-conflict") {
+            const approved = window.confirm(
+              `${result.message}\n\nPreserve both branches?\n\n` +
+              "Your current chat will stay unchanged. The complete remote branch will be attached and added as recovered context for the next turn. This cannot copy project files.",
+            );
+            if (!approved) throw new Error("Import canceled. Nothing was changed.");
+            setStatus({ text: "Preserving both conversation branches safely..." });
+            ({ response, result } = await upload(`${IMPORT_ROUTE}?onConflict=preserve-context`));
+          }
           if (!response.ok || !result.ok) throw new Error(result.message || `Import failed (${response.status}).`);
           await ctx.sessions.refresh();
           const changes = `${result.createdSessions} created, ${result.updatedSessions} updated, ${result.unchangedSessions} already current`;
           const details = `${result.eventsAdded} new event${result.eventsAdded === 1 ? "" : "s"}, ${result.attachments} attachment${result.attachments === 1 ? "" : "s"}`;
-          const summary = result.eventsAdded === 0 && result.createdSessions === 0 ? "Already up to date" : "Session synchronized";
-          setStatus({ success: true, text: `${summary}: “${result.title}” (${changes}; ${details}).` });
+          const recovered = result.recoveredSessions > 0
+            ? ` Recovered ${result.remoteEventsPreserved} remote events from ${result.recoveredSessions} forked session${result.recoveredSessions === 1 ? "" : "s"}; they will be available to the model on the next turn.`
+            : "";
+          const summary = result.eventsAdded === 0 && result.createdSessions === 0 ? "Already up to date" : result.recoveredSessions > 0 ? "Both branches preserved" : "Session synchronized";
+          setStatus({ success: true, text: `${summary}: “${result.title}” (${changes}; ${details}).${recovered}` });
         } catch (error) {
           setStatus({ error: true, text: error instanceof Error ? error.message : String(error) });
         } finally {
@@ -136,7 +151,7 @@ window.__ModuleLoader__.load({
           status ? h("div", { className: "zst-status", role: status.error ? "alert" : "status", "data-error": status.error || undefined, "data-success": status.success || undefined }, status.text) : null,
           h("div", { className: "zst-body" },
             h("article", { className: "zst-card" }, h("span", { className: "zst-card-icon" }, h(Glyph, { kind: "download" })), h("h3", null, "Export this chat"), h("p", null, "Downloads the complete raw session, title, mode, model and access settings, reasoning, tool calls, subagents, attached files, and images."), h("button", { type: "button", className: "zst-button", "data-primary": true, disabled: !currentId || busy, onClick: startExport }, h(Glyph, { kind: "download" }), "Export complete chat")),
-            h("article", { className: "zst-card zst-drop", "data-drag": drag || undefined, onDragOver: (event) => { event.preventDefault(); setDrag(true); }, onDragLeave: () => setDrag(false), onDrop }, h("span", { className: "zst-card-icon" }, h(Glyph, { kind: "upload" })), h("h3", null, "Import or sync a chat"), h("p", null, "Choose or drop a session ZIP. If this session already exists, only its missing newer events are added safely."), h("input", { ref: inputRef, type: "file", accept: ".zip,.zadloop-session.zip,application/zip", hidden: true, onChange: (event) => importFile(event.target.files?.[0]) }), h("button", { type: "button", className: "zst-button", disabled: busy, onClick: () => inputRef.current?.click() }, h(Glyph, { kind: "upload" }), busy ? "Synchronizing..." : "Choose transfer file"))
+            h("article", { className: "zst-card zst-drop", "data-drag": drag || undefined, onDragOver: (event) => { event.preventDefault(); setDrag(true); }, onDragLeave: () => setDrag(false), onDrop }, h("span", { className: "zst-card-icon" }, h(Glyph, { kind: "upload" })), h("h3", null, "Import or sync a chat"), h("p", null, "Choose or drop a session ZIP. Missing newer events are added safely; if both computers continued the chat, you can preserve both branches."), h("input", { ref: inputRef, type: "file", accept: ".zip,.zadloop-session.zip,application/zip", hidden: true, onChange: (event) => importFile(event.target.files?.[0]) }), h("button", { type: "button", className: "zst-button", disabled: busy, onClick: () => inputRef.current?.click() }, h(Glyph, { kind: "upload" }), busy ? "Synchronizing..." : "Choose transfer file"))
           ),
           h("footer", { className: "zst-foot" }, h("strong", null, "Chat sync only: "), "project/workspace files are not inside the session ZIP. Sync the project with Git or your file-sync service before resuming. Credentials and global ZadLoop preferences are never copied.")
         )

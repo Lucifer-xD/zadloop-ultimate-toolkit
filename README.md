@@ -5,7 +5,7 @@
 
   **One tarball. Seven integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-1.5.0-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-1.6.0-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
@@ -25,7 +25,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 | Context Surgery | Edit reply text, edit reasoning separately, remove messages from future model context, and use `/context` commands | 0.1.2 fixed-v4 |
 | Same-session Undo | Remove one user/assistant exchange from the transcript and future context without creating a new session | 1.5.1 |
 | Mode Switcher | Change the **current session** between Standard and Delegate mode | 2.0.3 |
-| Session Transfer | Export/import or safely fast-forward-sync a chat with its title, events, settings, subagents, and attachments | 1.1.0 |
+| Session Transfer | Export/import, fast-forward-sync, or safely preserve both branches of a forked chat | 1.2.0 |
 | Theme Studio | 50 dark + 20 light mode-exclusive themes, gradients, detailed controls, and a live preview | 5.0.3 |
 | Offline dependencies | Bundled runtime packages, including `fflate`; no npm lookup is required during tarball installation | bundled |
 
@@ -35,7 +35,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-1.5.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.5.0.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-1.6.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.6.0.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
@@ -52,7 +52,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.5.0.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.6.0.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.
@@ -142,7 +142,9 @@ Open **Themes** from the bottom dock. Choose from 70 mode-aware presets or tune 
 
 ![Session Transfer mockup](docs/images/session-transfer.svg)
 
-The archive preserves the session title and identity, model/mode/access events, full conversation, reasoning, tool calls/results, subagent sessions, attached files, and images. If the same session already exists, import safely appends only missing newer events when one history is an exact prefix of the other. An already-newer local copy is left unchanged; independently diverged histories are refused instead of being corrupted.
+The archive preserves the session title and identity, model/mode/access events, full conversation, reasoning, tool calls/results, subagent sessions, attached files, and images. If the same session already exists, import safely appends only missing newer events when one history is an exact prefix of the other. An already-newer local copy is left unchanged.
+
+If both computers continued the same session, Session Transfer detects the exact fork point and first refuses to make changes. Choose **Preserve both branches** in the confirmation dialog to keep the current timeline intact, attach the complete remote-only raw branch, and inject a structured remote transcript into the same session's next-turn context. Re-importing the same branch is deduplicated automatically.
 
 The session ZIP does not contain the actual project/workspace directory. Sync that directory separately with Git, OneDrive, Syncthing, or another file-sync system before continuing on the destination computer. This keeps both the model history and the real files in agreement.
 

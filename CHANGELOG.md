@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.0 — 2026-10-13
+
+- Upgrades Session Transfer to 1.2.0 with explicit, safe reconciliation for sessions that were continued independently on two computers.
+- Keeps the current local timeline intact while storing the complete remote-only branch as a content-addressed JSONL attachment.
+- Injects a structured remote transcript into the same session's next-turn model context, with fingerprint-based deduplication on repeated imports.
+- Preserves the original refusal-first behavior: no divergent history is changed unless the user confirms **Preserve both branches**.
+- Continues to require Git or file sync for workspace files, which are not contained in session archives.
+
 ## 1.5.0 — 2026-10-13
 
 - Upgrades Session Transfer to 1.1.0 with safe fast-forward synchronization for session IDs that already exist.

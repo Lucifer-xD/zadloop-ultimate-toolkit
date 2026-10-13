@@ -1,7 +1,7 @@
 {
   "name": "dsh-zadloop-session-transfer",
-  "version": "1.1.0",
-  "description": "Lossless ZadLoop session export, import, and safe fast-forward synchronization between computers.",
+  "version": "1.2.0",
+  "description": "Lossless ZadLoop session transfer with fast-forward sync and safe preservation of diverged branches.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

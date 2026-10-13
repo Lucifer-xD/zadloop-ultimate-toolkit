@@ -1,4 +1,5 @@
 import { unzipSync } from "fflate";
+import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 
 export const name = "zadloop-session-transfer";
@@ -8,6 +9,9 @@ export const IMPORT_PATH = "/api/zadloop-session-transfer/import";
 export const MAX_ARCHIVE_BYTES = 384 * 1024 * 1024;
 export const MAX_EXPANDED_BYTES = 768 * 1024 * 1024;
 export const MAX_ARCHIVE_ENTRIES = 10_000;
+
+const MAX_RECOVERY_CONTEXT_CHARS = 160_000;
+const RECOVERY_MARKER = "ZADLOOP_REMOTE_BRANCH:";
 
 const LOG_PATH = /^(?:session(?:\.v\d+)?\.jsonl|subagents\/[^/]+\/session(?:\.v\d+)?\.jsonl)$/u;
 const MEDIA_PATH = /^media\/([^/]+)\.(png|jpg|webp|gif)$/u;
@@ -209,17 +213,24 @@ function assertCompatibleHeader(local, incoming) {
   }
 }
 
-function classifyExistingLog(log, localHeader, localEvents, live) {
-  assertCompatibleHeader(localHeader, log.header);
-  const shared = Math.min(localEvents.length, log.events.length);
+function findDivergence(localEvents, incomingEvents) {
+  const shared = Math.min(localEvents.length, incomingEvents.length);
   for (let index = 0; index < shared; index += 1) {
-    if (!eventsEquivalent(localEvents[index], log.events[index])) {
-      throw new ImportFailure(
-        `Session ${log.header.id} has different history at event ${index}. Both computers changed this session, so it cannot be merged automatically without corrupting the conversation. Nothing was changed.`,
-        409,
-        "session-conflict",
-      );
-    }
+    if (!eventsEquivalent(localEvents[index], incomingEvents[index])) return index;
+  }
+  return -1;
+}
+
+function classifyExistingLog(log, localHeader, localEvents, live, preserveConflicts = false) {
+  assertCompatibleHeader(localHeader, log.header);
+  const divergence = findDivergence(localEvents, log.events);
+  if (divergence >= 0) {
+    if (preserveConflicts) return { kind: "conflict", log, live, localEvents, divergence };
+    throw new ImportFailure(
+      `Session ${log.header.id} has different history at event ${divergence}. Both computers changed this session, so it cannot be merged automatically without corrupting the conversation. Nothing was changed.`,
+      409,
+      "session-conflict",
+    );
   }
   if (localEvents.length < log.events.length) {
     return { kind: "update", log, live, localEvents, appendFrom: localEvents.length };
@@ -241,7 +252,7 @@ async function readStoredLog(ctx, id) {
   }
 }
 
-async function planSessionChanges(ctx, logs) {
+async function planSessionChanges(ctx, logs, preserveConflicts = false) {
   const plans = [];
   for (const log of logs) {
     const snapshot = await ctx.sessionPersistence.stat(log.header.id);
@@ -250,9 +261,135 @@ async function planSessionChanges(ctx, logs) {
       continue;
     }
     const stored = await readStoredLog(ctx, log.header.id);
-    plans.push(classifyExistingLog(log, stored.header, stored.events, stored.live));
+    plans.push(classifyExistingLog(log, stored.header, stored.events, stored.live, preserveConflicts));
   }
   return plans;
+}
+
+function textFromContent(content) {
+  if (!Array.isArray(content)) return "";
+  return content
+    .filter((block) => block?.type === "text" || block?.type === "reasoning")
+    .map((block) => String(block.text ?? ""))
+    .filter(Boolean)
+    .join("\n");
+}
+
+function clip(value, maximum) {
+  const text = String(value ?? "");
+  return text.length <= maximum ? text : `${text.slice(0, maximum)}\n[truncated]`;
+}
+
+function recoveryTranscript(plan, fingerprint) {
+  const lines = [
+    `[${RECOVERY_MARKER}${fingerprint}]`,
+    "Recovered conversation branch from another computer.",
+    `Session: ${plan.log.header.id}`,
+    `Common history: events 0-${plan.divergence - 1}`,
+    `Remote-only branch: ${plan.log.events.length - plan.divergence} events`,
+    "",
+    "Treat the transcript below as work that happened on the remote computer after the shared history. Use it as context in future replies. The complete raw remote event branch is attached for lossless reference. Workspace files are not contained in a session transfer; verify or sync those separately.",
+    "",
+    "--- REMOTE BRANCH TRANSCRIPT ---",
+  ];
+  let length = lines.join("\n").length;
+  for (const event of plan.log.events.slice(plan.divergence)) {
+    let entry = "";
+    if (event.type === "user/message") {
+      entry = `USER:\n${textFromContent(event.data?.content)}`;
+    } else if (event.type === "agent/inbox/spliced") {
+      const messages = Array.isArray(event.data?.inserted) ? event.data.inserted : [];
+      const value = messages.map((message) => textFromContent(message?.content)).filter(Boolean).join("\n");
+      if (value) entry = `USER (queued/inbox):\n${value}`;
+    } else if (event.type === "assistant/message") {
+      entry = `ASSISTANT:\n${textFromContent(event.data?.message?.content)}`;
+    } else if (event.type === "tool/call") {
+      entry = `TOOL CALL ${event.data?.name ?? "unknown"}:\n${clip(event.data?.arguments, 2_000)}`;
+    } else if (event.type === "tool/result") {
+      entry = `TOOL RESULT:\n${clip(textFromContent(event.data?.message?.content), 3_000)}`;
+    } else if (["agent-preset/selected", "model/selection", "sandbox/mode", "approval/policy", "permission/preset", "session/title", "goal/change", "todo/write"].includes(event.type)) {
+      entry = `${event.type}: ${clip(JSON.stringify(event.data), 2_000)}`;
+    }
+    if (entry.trim().length === 0) continue;
+    const block = `\n[remote event ${event.seq}]\n${entry}`;
+    if (length + block.length > MAX_RECOVERY_CONTEXT_CHARS) {
+      lines.push("\n[Transcript preview truncated. The attached JSONL contains every remote event.]\n");
+      break;
+    }
+    lines.push(block);
+    length += block.length;
+  }
+  return lines.join("\n");
+}
+
+function branchFingerprint(plan) {
+  return createHash("sha256")
+    .update(JSON.stringify({ id: plan.log.header.id, divergence: plan.divergence, events: plan.log.events.slice(plan.divergence) }))
+    .digest("hex");
+}
+
+function hasRecoveryMarker(events, fingerprint) {
+  const marker = `${RECOVERY_MARKER}${fingerprint}`;
+  return events.some((event) => event.type === "agent/inbox/spliced"
+    && event.data?.inserted?.some((message) => textFromContent(message?.content).includes(marker)));
+}
+
+function rawBranchBytes(plan, fingerprint) {
+  const records = [
+    { type: "zadloop-remote-branch", version: 1, sessionId: plan.log.header.id, commonEventCount: plan.divergence, fingerprint },
+    ...plan.log.events.slice(plan.divergence),
+  ];
+  return new TextEncoder().encode(`${records.map((record) => JSON.stringify(record)).join("\n")}\n`);
+}
+
+async function prepareConflictRecovery(ctx, plan) {
+  const fingerprint = branchFingerprint(plan);
+  if (hasRecoveryMarker(plan.localEvents, fingerprint)) return { plan, fingerprint, duplicate: true };
+  const bytes = rawBranchBytes(plan, fingerprint);
+  const name = `zadloop-remote-branch-${plan.log.header.id}-${fingerprint.slice(0, 12)}.jsonl`;
+  const attachment = await ctx.attachments.saveFile({ data: bytes, name });
+  return { plan, fingerprint, duplicate: false, attachment };
+}
+
+function recoveryData(recovery) {
+  return {
+    target: "next-turn",
+    start: 0,
+    inserted: [{
+      role: "user",
+      id: `remote-branch-${recovery.fingerprint}`,
+      source: { kind: "user" },
+      content: [
+        { type: "text", text: recoveryTranscript(recovery.plan, recovery.fingerprint) },
+        { type: "file", attachment: recovery.attachment },
+      ],
+    }],
+  };
+}
+
+async function recoverConflict(ctx, recovery) {
+  if (recovery.duplicate) return { added: 0, preserved: 0, duplicate: true };
+  const { plan } = recovery;
+  if (plan.live !== undefined) {
+    if (plan.live.seq !== plan.localEvents.length) {
+      throw new ImportFailure(`Session ${plan.log.header.id} changed while it was being reconciled. Wait for the current response to finish, then import again.`, 409, "session-busy");
+    }
+    plan.live.append("agent/inbox/spliced", recoveryData(recovery));
+    await ctx.sessions.flush(plan.live);
+  } else {
+    const handle = await ctx.sessionPersistence.open(plan.log.header.id, "write");
+    try {
+      const { events: current } = await handle.read(0);
+      if (findDivergence(plan.localEvents, current) >= 0 || current.length !== plan.localEvents.length) {
+        throw new ImportFailure(`Session ${plan.log.header.id} changed while it was being reconciled. Import again.`, 409, "session-busy");
+      }
+      await handle.append([{ seq: current.length, time: Date.now(), type: "agent/inbox/spliced", data: recoveryData(recovery) }]);
+      await handle.flush();
+    } finally {
+      await handle.close();
+    }
+  }
+  return { added: 1, preserved: plan.log.events.length - plan.divergence, duplicate: false };
 }
 
 function appendToLiveSession(session, events) {
@@ -320,7 +457,7 @@ async function createStoredSessions(ctx, plans) {
   }
 }
 
-export async function importTransferArchive(ctx, bytes) {
+export async function importTransferArchive(ctx, bytes, options = {}) {
   inspectZipLimits(bytes);
   let files;
   try {
@@ -333,8 +470,17 @@ export async function importTransferArchive(ctx, bytes) {
   if (logs.length === 0) throw new ImportFailure("This ZIP contains no ZadLoop Session log.");
   const root = logs.find((log) => !log.path.includes("/"));
   if (root === undefined) throw new ImportFailure("This ZIP has no root ZadLoop Session log.");
-  const plans = await planSessionChanges(ctx, logs);
+  const preserveConflicts = options.onConflict === "preserve-context";
+  const plans = await planSessionChanges(ctx, logs, preserveConflicts);
+  const conflictPlans = plans.filter((plan) => plan.kind === "conflict");
+  for (const plan of plans) {
+    if (plan.live !== undefined && plan.live.seq !== plan.localEvents.length) {
+      throw new ImportFailure(`Session ${plan.log.header.id} changed while it was being synchronized. Wait for the current response to finish, then import again.`, 409, "session-busy");
+    }
+  }
   const attachmentCount = await storeAttachments(ctx, entries);
+  const recoveries = [];
+  for (const plan of conflictPlans) recoveries.push(await prepareConflictRecovery(ctx, plan));
   let eventsAdded = 0;
   for (const plan of plans) {
     if (plan.kind === "update") eventsAdded += await updateStoredSession(ctx, plan);
@@ -342,6 +488,16 @@ export async function importTransferArchive(ctx, bytes) {
   const createPlans = plans.filter((plan) => plan.kind === "create");
   await createStoredSessions(ctx, createPlans);
   eventsAdded += createPlans.reduce((sum, plan) => sum + plan.log.events.length, 0);
+  let remoteEventsPreserved = 0;
+  let recoveredSessions = 0;
+  let duplicateRecoveries = 0;
+  for (const recovery of recoveries) {
+    const result = await recoverConflict(ctx, recovery);
+    eventsAdded += result.added;
+    remoteEventsPreserved += result.preserved;
+    if (result.duplicate) duplicateRecoveries += 1;
+    else recoveredSessions += 1;
+  }
   return {
     ok: true,
     sessionId: root.header.id,
@@ -349,8 +505,11 @@ export async function importTransferArchive(ctx, bytes) {
     sessions: logs.length,
     createdSessions: createPlans.length,
     updatedSessions: plans.filter((plan) => plan.kind === "update").length,
-    unchangedSessions: plans.filter((plan) => plan.kind === "unchanged").length,
-    attachments: attachmentCount,
+    unchangedSessions: plans.filter((plan) => plan.kind === "unchanged").length + duplicateRecoveries,
+    recoveredSessions,
+    remoteEventsPreserved,
+    conflicts: conflictPlans.map((plan) => ({ sessionId: plan.log.header.id, divergence: plan.divergence, localEvents: plan.localEvents.length, remoteEvents: plan.log.events.length })),
+    attachments: attachmentCount + recoveredSessions,
     events: logs.reduce((sum, log) => sum + log.events.length, 0),
     eventsAdded,
   };
@@ -370,7 +529,8 @@ export function apply(ctx) {
     requestBody: "streaming",
     fetch: async (request) => {
       try {
-        return Response.json(await importTransferArchive(ctx, await readBody(request)));
+        const url = new URL(request.url);
+        return Response.json(await importTransferArchive(ctx, await readBody(request), { onConflict: url.searchParams.get("onConflict") }));
       } catch (error) {
         ctx.logger?.warn?.("zadloop-session-transfer: import refused", error);
         return jsonError(error);

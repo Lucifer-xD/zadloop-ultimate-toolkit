@@ -19,7 +19,7 @@ function sessionText(id = "session-transfer-test") {
 test("package declares a managed ZadLoop bundle", async () => {
   const manifest = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
   assert.equal(manifest.name, "dsh-zadloop-session-transfer");
-  assert.equal(manifest.version, "1.1.0");
+  assert.equal(manifest.version, "1.2.0");
   assert.equal(manifest.dsh.bundle.patch, "./cordis.patch.yml");
   assert.ok(manifest.dsh.client.inject.includes("@deepseek-ai/dsh-api-session-controller"));
 });
@@ -74,6 +74,9 @@ test("import writes attachments and the exact session log", async () => {
     createdSessions: 1,
     updatedSessions: 0,
     unchangedSessions: 0,
+    recoveredSessions: 0,
+    remoteEventsPreserved: 0,
+    conflicts: [],
     attachments: 2,
     events: 2,
     eventsAdded: 2,
@@ -159,6 +162,50 @@ test("import refuses independently diverged histories before storing attachments
   assert.equal(attachmentWrites, 0);
 });
 
+test("explicit conflict recovery preserves the remote branch, injects context, and deduplicates repeats", async () => {
+  const archive = zipSync({ "session.v4.jsonl": strToU8(sessionText()) });
+  const local = parseSessionLog("session.v4.jsonl", strToU8(sessionText()));
+  local.events[1] = { ...local.events[1], data: { ...local.events[1].data, model: "different-local-model" } };
+  const liveEvents = [...local.events];
+  const saved = [];
+  const live = {
+    id: local.header.id,
+    header: local.header,
+    get seq() { return liveEvents.length; },
+    snapshotEvents() { return [...liveEvents]; },
+    append(type, data) { liveEvents.push({ seq: liveEvents.length, time: 999, type, data }); },
+  };
+  let flushes = 0;
+  const ctx = {
+    attachments: {
+      async saveFile({ data, name }) {
+        saved.push({ text: new TextDecoder().decode(data), name });
+        return { attachmentId: `sha256:${"b".repeat(64)}`, name, bytes: data.byteLength };
+      },
+    },
+    sessions: { get() { return live; }, async flush() { flushes += 1; } },
+    sessionPersistence: { async stat() { return { header: local.header }; } },
+  };
+
+  const first = await importTransferArchive(ctx, archive, { onConflict: "preserve-context" });
+  assert.equal(first.recoveredSessions, 1);
+  assert.equal(first.remoteEventsPreserved, 1);
+  assert.equal(first.eventsAdded, 1);
+  assert.equal(first.attachments, 1);
+  assert.equal(liveEvents.at(-1).type, "agent/inbox/spliced");
+  assert.match(liveEvents.at(-1).data.inserted[0].content[0].text, /ZADLOOP_REMOTE_BRANCH:/);
+  assert.match(saved[0].text, /"type":"zadloop-remote-branch"/);
+  assert.match(saved[0].name, /zadloop-remote-branch-session-transfer-test/);
+
+  const second = await importTransferArchive(ctx, archive, { onConflict: "preserve-context" });
+  assert.equal(second.recoveredSessions, 0);
+  assert.equal(second.remoteEventsPreserved, 0);
+  assert.equal(second.eventsAdded, 0);
+  assert.equal(second.unchangedSessions, 1);
+  assert.equal(saved.length, 1);
+  assert.equal(flushes, 1);
+});
+
 test("client registers one Transfer dock control and robust JSON handling", async () => {
   const source = await readFile(new URL("lib/client.js", root), "utf8");
   let definition;
@@ -174,7 +221,9 @@ test("client registers one Transfer dock control and robust JSON handling", asyn
   assert.match(source, /api\/zadloop-session-transfer\/import/);
   assert.match(source, /ctx\.sessions\.refresh\(\)/);
   assert.match(source, /reasoning, tool calls, subagents, attached files, and images/);
-  assert.match(source, /only its missing newer events are added safely/);
+  assert.match(source, /Missing newer events are added safely/);
+  assert.match(source, /onConflict=preserve-context/);
+  assert.match(source, /Preserve both branches/);
   assert.match(source, /project\/workspace files are not inside the session ZIP/);
   assert.match(source, /STYLE_OWNER/);
   assert.match(source, /height:22px!important/);
