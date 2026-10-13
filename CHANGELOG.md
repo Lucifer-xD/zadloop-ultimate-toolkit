@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0 — 2026-10-13
+
+- Upgrades Session Transfer to 1.1.0 with safe fast-forward synchronization for session IDs that already exist.
+- Appends only missing events when local history is an exact prefix, leaves newer local sessions unchanged, and refuses true two-sided divergence.
+- Supports synchronization while the target session is live and handles equivalent cross-computer resume events whose timestamps differ.
+- Fixes seeded subagent restoration by preserving the inherited-event boundary during import.
+- Clarifies that session ZIPs include chat attachments but not the actual project directory; workspace changes should be synchronized with Git or a file-sync service.
+
 ## 1.4.1 — 2026-10-13
 
 - Redesigns Remote Control around a one-click **Create secure remote link** flow.

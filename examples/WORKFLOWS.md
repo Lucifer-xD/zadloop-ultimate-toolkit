@@ -51,11 +51,12 @@ The session ID, transcript, working directory, and settings stay attached to the
 
 ## Move a chat from a PC to an RDP
 
-On the source computer:
+On the computer with the newest copy:
 
 1. Open the session.
 2. Choose **Transfer → Export complete chat**.
-3. Move the ZIP to the RDP using your preferred secure channel.
+3. Commit and push project-file changes with Git (or finish syncing them with your file-sync service).
+4. Move the ZIP to the other computer using your preferred secure channel.
 
 On the destination:
 
@@ -63,9 +64,10 @@ On the destination:
 2. Configure your model provider credentials separately.
 3. Choose **Transfer → Choose transfer file**.
 4. Select the ZIP and wait for the success summary.
-5. Open the imported session from the sidebar.
+5. Pull/sync the project files into the same local workspace.
+6. Open the imported or synchronized session from the sidebar.
 
-If the same session ID already exists, import stops without overwriting anything.
+If the same session ID already exists and the incoming history extends it, Session Transfer appends only the missing events. If the local copy is already newer, it changes nothing. If both copies contain different events after their common point, import stops and reports a conflict instead of damaging either timeline.
 
 ## Pair dark and light themes
 

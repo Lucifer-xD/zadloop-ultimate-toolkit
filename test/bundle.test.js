@@ -7,7 +7,7 @@ const root = new URL("../", import.meta.url);
 test("declares one installable managed ZadLoop bundle", async () => {
   const manifest = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
   assert.equal(manifest.name, "dsh-zadloop-ultimate-toolkit");
-  assert.equal(manifest.version, "1.4.1");
+  assert.equal(manifest.version, "1.5.0");
   assert.equal(manifest.dsh.bundle.patch, "./cordis.patch.yml");
   assert.equal(manifest.bundledDependencies.length, 8);
 });
@@ -35,7 +35,7 @@ test("all offline vendor archives are present", async () => {
     "dsh-zadloop-computer-use-1.1.1.tgz",
     "dsh-zadloop-remote-control-2.1.2.tgz",
     "dsh-zadloop-theme-studio-5.0.3.tgz",
-    "dsh-zadloop-session-transfer-1.0.2.tgz",
+    "dsh-zadloop-session-transfer-1.1.0.tgz",
     "fflate-0.8.3.tgz",
   ]) {
     await access(new URL(`vendor/${file}`, root));
@@ -56,4 +56,12 @@ test("Remote Control source matches the bundled component version", async () => 
   assert.equal(remote.name, "dsh-zadloop-remote-control");
   assert.equal(remote.version, "2.1.2");
   assert.equal(toolkit.dependencies[remote.name], `file:vendor/${remote.name}-${remote.version}.tgz`);
+});
+
+test("Session Transfer source matches the bundled component version", async () => {
+  const toolkit = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
+  const transfer = JSON.parse(await readFile(new URL("packages/session-transfer/package.json", root), "utf8"));
+  assert.equal(transfer.name, "dsh-zadloop-session-transfer");
+  assert.equal(transfer.version, "1.1.0");
+  assert.equal(toolkit.dependencies[transfer.name], `file:vendor/${transfer.name}-${transfer.version}.tgz`);
 });

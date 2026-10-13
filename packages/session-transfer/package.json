@@ -1,0 +1,53 @@
+{
+  "name": "dsh-zadloop-session-transfer",
+  "version": "1.1.0",
+  "description": "Lossless ZadLoop session export, import, and safe fast-forward synchronization between computers.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-api-session-controller"
+      ],
+      "immediately": true
+    }
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  },
+  "scripts": {
+    "check": "node --check lib/index.js && node --check lib/client.js",
+    "test": "node --test test/*.test.js",
+    "prepublishOnly": "npm run check && npm test"
+  },
+  "license": "MIT",
+  "author": "Lucifer",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "keywords": [
+    "zadloop",
+    "dsh",
+    "session",
+    "transfer",
+    "import",
+    "export"
+  ]
+}

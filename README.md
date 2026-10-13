@@ -5,7 +5,7 @@
 
   **One tarball. Seven integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-1.4.1-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-1.5.0-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
@@ -25,7 +25,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 | Context Surgery | Edit reply text, edit reasoning separately, remove messages from future model context, and use `/context` commands | 0.1.2 fixed-v4 |
 | Same-session Undo | Remove one user/assistant exchange from the transcript and future context without creating a new session | 1.5.1 |
 | Mode Switcher | Change the **current session** between Standard and Delegate mode | 2.0.3 |
-| Session Transfer | Export/import a complete chat with title, events, settings, subagents, files, and images | 1.0.2 |
+| Session Transfer | Export/import or safely fast-forward-sync a chat with its title, events, settings, subagents, and attachments | 1.1.0 |
 | Theme Studio | 50 dark + 20 light mode-exclusive themes, gradients, detailed controls, and a live preview | 5.0.3 |
 | Offline dependencies | Bundled runtime packages, including `fflate`; no npm lookup is required during tarball installation | bundled |
 
@@ -35,7 +35,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-1.4.1.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.4.1.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-1.5.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.5.0.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
@@ -52,7 +52,7 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.4.1.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.5.0.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.
@@ -142,7 +142,9 @@ Open **Themes** from the bottom dock. Choose from 70 mode-aware presets or tune 
 
 ![Session Transfer mockup](docs/images/session-transfer.svg)
 
-The archive preserves the session title and identity, model/mode/access events, full conversation, reasoning, tool calls/results, subagent sessions, files, and images. Import refuses to overwrite an existing session ID.
+The archive preserves the session title and identity, model/mode/access events, full conversation, reasoning, tool calls/results, subagent sessions, attached files, and images. If the same session already exists, import safely appends only missing newer events when one history is an exact prefix of the other. An already-newer local copy is left unchanged; independently diverged histories are refused instead of being corrupted.
+
+The session ZIP does not contain the actual project/workspace directory. Sync that directory separately with Git, OneDrive, Syncthing, or another file-sync system before continuing on the destination computer. This keeps both the model history and the real files in agreement.
 
 Machine-wide credentials, API keys, provider logins, and global preferences are intentionally excluded. Configure those separately on the destination computer.
 
@@ -160,7 +162,7 @@ See [examples/WORKFLOWS.md](examples/WORKFLOWS.md) for complete workflows:
 
 - No telemetry is added by this toolkit.
 - Remote Control is disabled by default, requires authentication for every network/tunnel mode, supports expiring/revocable sessions, and never exposes ZadLoop's private upstream cookie.
-- Session Transfer writes only to local ZadLoop session/attachment storage.
+- Session Transfer writes only to local ZadLoop session/attachment storage and never overwrites divergent histories.
 - Imported archives are checked for traversal paths, encryption, ZIP64, entry count, compressed size, expanded size, valid JSONL, contiguous event sequences, duplicate session IDs, and attachment integrity.
 - Context edits and Undo are append-only. They change the model-visible surface rather than erasing the durable log.
 - Context Surgery exposes loopback-only local API routes. Any trusted local process can reach loopback, so use ZadLoop on a trusted machine.
@@ -187,7 +189,7 @@ npm run check
 npm pack
 ```
 
-The release package uses npm `bundledDependencies`. The `vendor/` archives make builds deterministic and keep installation offline. The complete Computer Use and Remote Control sources, client panels, and tests live in [`packages/computer-use`](packages/computer-use/) and [`packages/remote-control`](packages/remote-control/).
+The release package uses npm `bundledDependencies`. The `vendor/` archives make builds deterministic and keep installation offline. Component sources, client panels, and tests live under [`packages/`](packages/).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md).
 
