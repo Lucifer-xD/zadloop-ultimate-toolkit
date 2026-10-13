@@ -30,6 +30,7 @@ export function createTunnelSupervisor(settings, dependencies = {}) {
   let state;
   let failures = 0;
   let probing = false;
+  let outputBuffer = "";
   const setState = (next) => { if (state !== next) { state = next; send({ type: "state", state: next }); } };
 
   async function checkHealth(owned) {
@@ -48,9 +49,15 @@ export function createTunnelSupervisor(settings, dependencies = {}) {
   }
 
   function inspectOutput(chunk) {
-    const text = String(chunk);
-    const match = /https:\/\/[a-z0-9-]+\.trycloudflare\.com\/?/iu.exec(text);
-    if (match) { failures = 0; send({ type: "url", url: match[0] }); setState("ready"); }
+    outputBuffer += String(chunk);
+    const lines = outputBuffer.split(/\r?\n/u);
+    outputBuffer = lines.pop() ?? "";
+    for (const line of lines) {
+      const match = /https:\/\/[a-z0-9-]+\.trycloudflare\.com\/?/iu.exec(line);
+      if (match) send({ type: "url", url: match[0] });
+      if (/registered tunnel connection/iu.test(line)) { failures = 0; setState("ready"); }
+      if (/\b(?:ERR|error|failed|unable)\b/iu.test(line)) send({ type: "diagnostic", message: line.replace(/\s+/gu, " ").trim().slice(-500) });
+    }
   }
 
   function launch() {

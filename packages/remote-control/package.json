@@ -1,7 +1,7 @@
 {
   "name": "dsh-zadloop-remote-control",
-  "version": "2.0.0",
-  "description": "Authenticated full-interface remote access for ZadLoop over loopback, LAN, Cloudflare Quick Tunnels, or a custom Cloudflare domain.",
+  "version": "2.1.2",
+  "description": "One-click authenticated full-interface remote access for ZadLoop, plus LAN and custom Cloudflare domain modes.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

@@ -1,12 +1,16 @@
 # ZadLoop Remote Control
 
 Remote Control exposes the complete ZadLoop web interface through a separately
-managed, authenticated listener. It supports local browser access, LAN access,
-Cloudflare Quick Tunnels, and existing named Cloudflare tunnels/custom domains.
+managed, authenticated listener. The recommended flow needs one click: select
+**Create secure remote link** and the plugin generates an access code, detects or
+installs cloudflared, starts a Quick Tunnel, and presents one copyable invite.
+
+Advanced setup supports local browser access, LAN access, manual Cloudflare Quick
+Tunnels, and existing named Cloudflare tunnels/custom domains.
 
 Remote access is disabled after installation. Open **Remote** in the conversation
-toolbar to configure and start it. Network and tunnel modes require a passphrase;
-passwordless access is restricted to the loopback interface.
+toolbar and use the large one-click button. Network and tunnel modes always use a
+passphrase; passwordless access is restricted to the loopback interface.
 
 Configuration is stored outside the package in
 `~/.zadloop-remote-control/config-v2.json`. Passwords are stored as salted scrypt

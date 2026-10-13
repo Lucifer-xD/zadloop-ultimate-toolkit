@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.1 — 2026-10-13
+
+- Redesigns Remote Control around a one-click **Create secure remote link** flow.
+- Automatically detects or installs `cloudflared`, generates a strong access code, starts a Quick Tunnel, and presents a single copyable invite.
+- Moves local, LAN/IP, manual Quick Tunnel, and custom-domain settings under Advanced setup.
+- Keeps the generated access code only in the host renderer session and stores only its salted scrypt hash on disk.
+- Adds tests for one-click generation, fixed-package installation, hash-only storage, and automatic tunnel startup.
+- Isolates Quick Tunnels from existing `~/.cloudflared/config.yml` files so named-tunnel ingress rules cannot hijack the one-click link.
+
 ## 1.3.0 — 2026-10-12
 
 - Adds authenticated full-interface Remote Control 2.0.0.

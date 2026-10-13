@@ -1,3 +1,6 @@
+import { spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
+import { existsSync } from "node:fs";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { homedir, networkInterfaces } from "node:os";
 import { dirname, join } from "node:path";
@@ -15,6 +18,37 @@ const MODES = new Set(["local", "lan", "quick", "named"]);
 function cleanString(value, max = 500) { return typeof value === "string" ? value.trim().slice(0, max) : ""; }
 function portNumber(value) { const number = Number(value); if (!Number.isInteger(number) || number < 1024 || number > 65_535) throw new Error("Port must be an integer from 1024 to 65535."); return number; }
 function sessionHours(value) { const number = Number(value); if (![1, 8, 24, 168].includes(number)) throw new Error("Session lifetime must be 1, 8, 24, or 168 hours."); return number; }
+
+export function generateAccessCode() {
+  return randomBytes(12).toString("base64url").match(/.{1,4}/gu).join("-");
+}
+
+function wingetExecutable(environment = process.env) {
+  const explicit = environment.LOCALAPPDATA && join(environment.LOCALAPPDATA, "Microsoft", "WindowsApps", "winget.exe");
+  return explicit && existsSync(explicit) ? explicit : "winget.exe";
+}
+
+export async function installCloudflared(dependencies = {}) {
+  if (process.platform !== "win32" && !dependencies.allowNonWindows) throw new Error("Automatic cloudflared installation currently supports Windows only.");
+  const environment = dependencies.environment ?? process.env;
+  const spawnImpl = dependencies.spawnImpl ?? spawn;
+  const findImpl = dependencies.findImpl ?? findCloudflared;
+  try { return await findImpl(undefined, environment); } catch {}
+  const args = ["install", "--id", "Cloudflare.cloudflared", "--exact", "--silent", "--accept-package-agreements", "--accept-source-agreements", "--disable-interactivity"];
+  await new Promise((resolve, reject) => {
+    const child = spawnImpl(wingetExecutable(environment), args, { windowsHide: true, stdio: ["ignore", "pipe", "pipe"], env: environment });
+    let output = "";
+    const collect = (chunk) => { if (output.length < 16_000) output += String(chunk); };
+    child.stdout?.on("data", collect);
+    child.stderr?.on("data", collect);
+    const timer = setTimeout(() => { child.kill(); reject(new Error("Cloudflare installation timed out after five minutes.")); }, 5 * 60_000);
+    timer.unref?.();
+    child.once("error", (error) => { clearTimeout(timer); reject(new Error(`Unable to start Windows Package Manager: ${error.message}`)); });
+    child.once("exit", (code) => { clearTimeout(timer); if (code === 0) resolve(); else reject(new Error(`Windows Package Manager could not install cloudflared (${code}). ${output.trim().slice(-800)}`)); });
+  });
+  try { return await findImpl(undefined, environment); }
+  catch { throw new Error("cloudflared finished installing but was not found. Restart ZadLoop once, then click Create secure remote link again."); }
+}
 
 export function validateConfiguration(value, previous = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Configuration must be an object.");
@@ -52,11 +86,14 @@ async function atomicJson(path, value) {
 }
 
 export class RemoteController {
-  constructor({ webServer, connection, logger, configPath = DEFAULT_CONFIG_PATH }) {
+  constructor({ webServer, connection, logger, configPath = DEFAULT_CONFIG_PATH, installCloudflaredImpl = installCloudflared, startQuickTunnelImpl = startQuickTunnel, startNamedTunnelImpl = startNamedTunnel }) {
     this.webServer = webServer;
     this.connection = connection;
     this.logger = logger;
     this.configPath = configPath;
+    this.installCloudflaredImpl = installCloudflaredImpl;
+    this.startQuickTunnelImpl = startQuickTunnelImpl;
+    this.startNamedTunnelImpl = startNamedTunnelImpl;
     this.config = validateConfiguration({ mode: "local", port: 48911, sessionHours: 8, enabled: false });
     this.proxy = undefined;
     this.tunnel = undefined;
@@ -105,6 +142,7 @@ export class RemoteController {
       mode: this.config.mode,
       urls,
       tunnelState: this.tunnel?.status() ?? (running && ["quick", "named"].includes(this.config.mode) ? "starting" : "disabled"),
+      tunnelMessage: this.tunnel?.diagnostic?.() ?? "",
       sessions: this.proxy?.sessions.count() ?? 0,
       startedAt: this.startedAt,
       error: this.error,
@@ -133,6 +171,19 @@ export class RemoteController {
     return this.snapshot();
   }
 
+  async quickStart() {
+    await this.stop({ persist: false });
+    const accessCode = generateAccessCode();
+    const binary = await this.installCloudflaredImpl();
+    const next = validateConfiguration({ mode: "quick", port: this.config.port || 48911, sessionHours: this.config.sessionHours || 8, enabled: false, cloudflare: { ...this.config.cloudflare, binary } }, this.config);
+    next.password = await hashPassphrase(accessCode);
+    this.config = next;
+    this.error = "";
+    await this.save();
+    const state = await this.start();
+    return { ...state, accessCode };
+  }
+
   async start({ persist = true } = {}) {
     if (this.proxy) return this.snapshot();
     if (this.busy) throw new Error("Remote Control is already changing state.");
@@ -156,8 +207,8 @@ export class RemoteController {
       try {
         await proxy.listen(this.config.port, host);
         this.proxy = proxy;
-        if (this.config.mode === "quick") this.tunnel = await startQuickTunnel(this.config.cloudflare, this.config.port);
-        if (this.config.mode === "named") this.tunnel = await startNamedTunnel(this.config.cloudflare, this.config.port);
+        if (this.config.mode === "quick") this.tunnel = await this.startQuickTunnelImpl(this.config.cloudflare, this.config.port);
+        if (this.config.mode === "named") this.tunnel = await this.startNamedTunnelImpl(this.config.cloudflare, this.config.port);
       } catch (error) { await proxy.close(); this.proxy = undefined; await this.tunnel?.stop(); this.tunnel = undefined; if (error?.code === "EADDRINUSE") throw new Error(`Port ${this.config.port} is already in use.`); throw error; }
       this.startedAt = Date.now();
       this.config.enabled = true;
@@ -197,6 +248,7 @@ function apiRoute(controller) {
       try { body = await request.json(); } catch { return Response.json({ ok: false, message: "Invalid JSON body." }, { status: 400 }); }
       try {
         if (body?.operation === "configure") return Response.json(await controller.configure(body));
+        if (body?.operation === "quick_start") return Response.json(await controller.quickStart());
         if (body?.operation === "start") return Response.json(await controller.start());
         if (body?.operation === "stop") return Response.json(await controller.stop());
         if (body?.operation === "revoke") return Response.json(controller.revoke());

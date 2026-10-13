@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { createServer, request } from "node:http";
+import { EventEmitter } from "node:events";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-import { validateConfiguration } from "../lib/index.js";
+import { generateAccessCode, installCloudflared, RemoteController, validateConfiguration } from "../lib/index.js";
 import { createRemoteProxy, hashPassphrase, verifyPassphrase } from "../lib/proxy.js";
 import { childEnvironment, renderTunnelConfig, validateNamedTunnel } from "../lib/tunnel.js";
 
@@ -49,6 +50,64 @@ test("passphrases are salted, slow-hashed, and timing-safe verified", async () =
   assert.equal(await verifyPassphrase("a correct horse battery staple", first), true);
   assert.equal(await verifyPassphrase("wrong password", first), false);
   await assert.rejects(hashPassphrase("too short"), /12/);
+});
+
+test("one-click access codes are strong, readable, and never contain ambiguous punctuation", () => {
+  const values = new Set(Array.from({ length: 20 }, () => generateAccessCode()));
+  assert.equal(values.size, 20);
+  for (const value of values) assert.match(value, /^[A-Za-z0-9_-]{4}(?:-[A-Za-z0-9_-]{4}){3}$/u);
+});
+
+test("automatic cloudflared installation uses one fixed winget package and silent consent flags", async () => {
+  let lookup = 0;
+  let invoked;
+  const result = await installCloudflared({
+    allowNonWindows: true,
+    environment: { PATH: "C:\\Windows", LOCALAPPDATA: "C:\\Missing" },
+    async findImpl() { lookup += 1; if (lookup === 1) throw new Error("missing"); return "C:\\Tools\\cloudflared.exe"; },
+    spawnImpl(executable, args, options) {
+      invoked = { executable, args, options };
+      const child = new EventEmitter();
+      child.stdout = new EventEmitter();
+      child.stderr = new EventEmitter();
+      child.kill = () => {};
+      queueMicrotask(() => child.emit("exit", 0));
+      return child;
+    },
+  });
+  assert.equal(result, "C:\\Tools\\cloudflared.exe");
+  assert.equal(invoked.executable, "winget.exe");
+  assert.deepEqual(invoked.args, ["install", "--id", "Cloudflare.cloudflared", "--exact", "--silent", "--accept-package-agreements", "--accept-source-agreements", "--disable-interactivity"]);
+  assert.equal(invoked.options.windowsHide, true);
+});
+
+test("one-click controller stores only a hash and returns the generated code once", async (t) => {
+  const temporary = await mkdtemp(join(tmpdir(), "zrc-one-click-"));
+  const reservation = createServer();
+  await new Promise((resolve) => reservation.listen(0, "127.0.0.1", resolve));
+  const port = reservation.address().port;
+  await new Promise((resolve) => reservation.close(resolve));
+  const tunnel = { status: () => "ready", publicUrl: () => "https://example.trycloudflare.com/", stop: async () => {} };
+  const controller = new RemoteController({
+    webServer: { port: 34567 },
+    connection: {
+      authenticatedUrl(url) { return `${url}?token=private`; },
+      authorizeIndex(_req, res) { res.writeHead(303, { "set-cookie": "dsh-auth-test=v1.private; Max-Age=60; HttpOnly" }); res.end(); return false; },
+    },
+    configPath: join(temporary, "config.json"),
+    installCloudflaredImpl: async () => "C:\\Tools\\cloudflared.exe",
+    startQuickTunnelImpl: async () => tunnel,
+  });
+  controller.config.port = port;
+  t.after(async () => { await controller.dispose(); await rm(temporary, { recursive: true, force: true }); });
+  const state = await controller.quickStart();
+  assert.match(state.accessCode, /^[A-Za-z0-9_-]{4}(?:-[A-Za-z0-9_-]{4}){3}$/u);
+  assert.equal(state.running, true);
+  assert.deepEqual(state.urls, ["https://example.trycloudflare.com/"]);
+  const saved = JSON.parse(await readFile(join(temporary, "config.json"), "utf8"));
+  assert.equal(saved.password.algorithm, "scrypt");
+  assert.equal(JSON.stringify(saved).includes(state.accessCode), false);
+  assert.equal(saved.cloudflare.binary, "C:\\Tools\\cloudflared.exe");
 });
 
 test("passwordless loopback proxy forwards the full app without leaking upstream credentials", async (t) => {
@@ -117,7 +176,7 @@ test("named tunnel config is strict and child environment omits account secrets"
 test("manifest exposes a managed client bundle and stores no credentials", async () => {
   const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
   assert.equal(manifest.name, "dsh-zadloop-remote-control");
-  assert.equal(manifest.version, "2.0.0");
+  assert.equal(manifest.version, "2.1.2");
   assert.equal(manifest.dsh.client.platform, "web");
   const temporary = await mkdtemp(join(tmpdir(), "zrc-test-"));
   await rm(temporary, { recursive: true, force: true });

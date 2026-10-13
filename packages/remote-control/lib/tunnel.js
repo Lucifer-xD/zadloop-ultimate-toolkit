@@ -47,6 +47,7 @@ async function launchSupervisor(settings, dependencies = {}) {
   let stopped = false;
   let state = "starting";
   let publicUrl = settings.publicUrl ?? null;
+  let diagnostic = "";
   let stopPromise;
   supervisor = spawnSupervisor(dependencies.nodeExecutable ?? process.execPath, [fileURLToPath(new URL("./supervisor.js", import.meta.url))], {
     windowsHide: true, stdio: ["ignore", "ignore", "ignore", "ipc"], env: { ...childEnvironment(dependencies.environment ?? process.env), ELECTRON_RUN_AS_NODE: "1" },
@@ -60,7 +61,7 @@ async function launchSupervisor(settings, dependencies = {}) {
     failStartup = () => finish(new Error("Unable to configure the tunnel supervisor."));
     supervisor.once("error", () => finish(new Error("Unable to launch the tunnel supervisor.")));
     supervisor.once("exit", () => finish(new Error("Tunnel supervisor exited during startup.")));
-    supervisor.on("message", (message) => { if (message?.type === "launched") { childPid = message.pid; finish(); } if (message?.type === "child") childPid = message.pid; if (message?.type === "state" && !stopped) state = message.state; if (message?.type === "url") publicUrl = message.url; });
+    supervisor.on("message", (message) => { if (message?.type === "launched") { childPid = message.pid; finish(); } if (message?.type === "child") childPid = message.pid; if (message?.type === "state" && !stopped) state = message.state; if (message?.type === "url") publicUrl = message.url; if (message?.type === "diagnostic") diagnostic = message.message; });
   });
   supervisor.on("error", () => {});
   supervisor.on("exit", () => { killOwned(); if (!stopped) state = "failed"; });
@@ -72,12 +73,23 @@ async function launchSupervisor(settings, dependencies = {}) {
   };
   try { supervisor.send({ type: "start", ...settings }, (error) => { if (error) failStartup(); }); await started; }
   catch (error) { failStartup(); await started.catch(() => {}); await stop(); throw error; }
-  return { stop, status: () => state, publicUrl: () => publicUrl };
+  return { stop, status: () => state, publicUrl: () => publicUrl, diagnostic: () => diagnostic };
 }
 
 export async function startQuickTunnel(config, port, dependencies = {}) {
   const binary = await findCloudflared(config.binary, dependencies.environment ?? process.env);
-  return launchSupervisor({ binary, args: ["tunnel", "--no-autoupdate", "--url", `http://127.0.0.1:${port}`], environment: childEnvironment(dependencies.environment ?? process.env) }, dependencies);
+  const directory = await mkdtemp(join(dependencies.tempRoot ?? tmpdir(), "zadloop-quick-tunnel-"));
+  const configPath = join(directory, "config.yml");
+  try {
+    // An existing ~/.cloudflared/config.yml can override Quick Tunnel routing
+    // (commonly with a catch-all http_status:404 ingress). Always isolate the
+    // one-click tunnel from account/named-tunnel configuration on the machine.
+    await writeFile(configPath, "no-autoupdate: true\n", { mode: 0o600 });
+    return await launchSupervisor({ binary, args: ["tunnel", "--config", configPath, "--no-autoupdate", "--protocol", "http2", "--url", `http://127.0.0.1:${port}`], environment: childEnvironment(dependencies.environment ?? process.env), directory }, dependencies);
+  } catch (error) {
+    await rm(directory, { recursive: true, force: true });
+    throw error;
+  }
 }
 
 export async function startNamedTunnel(config, port, dependencies = {}) {
