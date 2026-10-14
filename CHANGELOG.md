@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.1 — 2026-10-14
+
+- Fixes Cloudflare login form submissions being rejected after the login page loaded.
+- Allows only `GET` and `POST` on the isolated login endpoint to survive tunnel host rewriting; password verification, rate limiting, Strict cookies, API origin checks, and WebSocket authentication remain enforced.
+
 ## 1.9.0 — 2026-10-14
 
 - Fixes Cloudflare Quick Tunnel login refreshes that retained a foreign `Origin` while omitting browser navigation headers; the public read-only login document now loads while cross-site POST, API, and WebSocket traffic remains blocked.

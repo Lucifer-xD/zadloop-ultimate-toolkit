@@ -170,7 +170,8 @@ test("cross-site link clicks may reach login but unsafe cross-site requests rema
   assert.equal(strippedCloudflareRefresh.status, 200);
   assert.match(strippedCloudflareRefresh.body, /ZadLoop Remote/);
   const strippedCloudflarePost = await call(origin, "/__zadloop_remote__/login", { method: "POST", headers: { origin: "https://launcher.invalid", "sec-fetch-site": "cross-site", "content-type": "application\/x-www-form-urlencoded" }, body: "password=blocked" });
-  assert.equal(strippedCloudflarePost.status, 403);
+  assert.equal(strippedCloudflarePost.status, 401);
+  assert.match(strippedCloudflarePost.body, /Incorrect passphrase/);
   const unsafe = await call(origin, "/api/private", { method: "POST", headers: { "sec-fetch-site": "cross-site", "sec-fetch-mode": "cors", "sec-fetch-dest": "empty" }, body: "blocked" });
   assert.equal(unsafe.status, 403);
   const unsafeWithOrigin = await call(origin, "/api/private", { method: "POST", headers: { origin: "https://launcher.invalid", "sec-fetch-site": "cross-site", "sec-fetch-mode": "cors", "sec-fetch-dest": "empty" }, body: "blocked" });
@@ -202,7 +203,7 @@ test("named tunnel config is strict and child environment omits account secrets"
 test("manifest exposes a managed client bundle and stores no credentials", async () => {
   const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
   assert.equal(manifest.name, "dsh-zadloop-remote-control");
-  assert.equal(manifest.version, "2.2.3");
+  assert.equal(manifest.version, "2.2.4");
   assert.equal(manifest.dsh.client.platform, "web");
   const temporary = await mkdtemp(join(tmpdir(), "zrc-test-"));
   await rm(temporary, { recursive: true, force: true });
