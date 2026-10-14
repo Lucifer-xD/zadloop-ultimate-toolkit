@@ -7,7 +7,7 @@ const root = new URL("../", import.meta.url);
 test("declares one installable managed ZadLoop bundle", async () => {
   const manifest = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
   assert.equal(manifest.name, "dsh-zadloop-ultimate-toolkit");
-  assert.equal(manifest.version, "2.0.0");
+  assert.equal(manifest.version, "2.0.1");
   assert.equal(manifest.dsh.bundle.patch, "./cordis.patch.yml");
   assert.equal(manifest.bundledDependencies.length, 10);
 });
@@ -39,7 +39,7 @@ test("all offline vendor archives are present", async () => {
     "dsh-zadloop-remote-control-v224-2.2.4.tgz",
     "dsh-zadloop-theme-studio-v530-5.3.0.tgz",
     "dsh-zadloop-session-transfer-1.2.0.tgz",
-    "dsh-zadloop-toolkit-ui-1.0.0.tgz",
+    "dsh-zadloop-toolkit-ui-1.0.1.tgz",
     "fflate-0.8.3.tgz",
   ]) {
     await access(new URL(`vendor/${file}`, root));
@@ -58,7 +58,7 @@ test("Toolkit UI source matches the bundled component version", async () => {
   const toolkit = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
   const ui = JSON.parse(await readFile(new URL("packages/toolkit-ui/package.json", root), "utf8"));
   assert.equal(ui.name, "dsh-zadloop-toolkit-ui");
-  assert.equal(ui.version, "1.0.0");
+  assert.equal(ui.version, "1.0.1");
   assert.equal(toolkit.dependencies[ui.name], `file:vendor/${ui.name}-${ui.version}.tgz`);
 });
 

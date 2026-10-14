@@ -1,7 +1,7 @@
 {
   "name": "dsh-zadloop-ultimate-toolkit",
-  "version": "2.0.0",
-  "description": "One-install ZadLoop toolkit: subscription OAuth, live usage, secure remote control, computer use, Context Surgery, Undo, mode switching, session transfer, and 72 modern themes.",
+  "version": "2.0.1",
+  "description": "One-install ZadLoop toolkit: subscription OAuth, live remaining plan quota, secure remote control, computer use, Context Surgery, Undo, mode switching, session transfer, and 72 modern themes.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -29,7 +29,7 @@
     "dsh-zadloop-remote-control-v224": "file:vendor/dsh-zadloop-remote-control-v224-2.2.4.tgz",
     "dsh-zadloop-session-transfer": "file:vendor/dsh-zadloop-session-transfer-1.2.0.tgz",
     "dsh-zadloop-theme-studio-v530": "file:vendor/dsh-zadloop-theme-studio-v530-5.3.0.tgz",
-    "dsh-zadloop-toolkit-ui": "file:vendor/dsh-zadloop-toolkit-ui-1.0.0.tgz",
+    "dsh-zadloop-toolkit-ui": "file:vendor/dsh-zadloop-toolkit-ui-1.0.1.tgz",
     "dsh-zadloop-undo": "file:vendor/dsh-zadloop-undo-1.5.1.tgz",
     "fflate": "file:vendor/fflate-0.8.3.tgz"
   },
@@ -64,7 +64,7 @@
     "agent-mode",
     "computer-use",
     "oauth-subscriptions",
-    "usage-dashboard",
+    "quota-dashboard",
     "remote-control",
     "cloudflare-tunnel"
   ],

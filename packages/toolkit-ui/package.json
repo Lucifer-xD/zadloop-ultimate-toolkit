@@ -1,7 +1,7 @@
 {
   "name": "dsh-zadloop-toolkit-ui",
-  "version": "1.0.0",
-  "description": "Shared dock polish, subscription usage summary, and scoped UI fixes for ZadLoop Ultimate Toolkit.",
+  "version": "1.0.1",
+  "description": "Shared dock polish, remaining plan-quota summary, and scoped UI fixes for ZadLoop Ultimate Toolkit.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

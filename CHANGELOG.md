@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1 — 2026-10-14
+
+- Corrects the composer metric to show the active Codex subscription plan's quota **remaining**, rather than consumed token usage.
+- Displays both rolling **5-hour** and **weekly** remaining percentages in a compact readable control.
+- Refreshes from the upstream plugin's public quota snapshot, highlights low remaining quota, and opens the detailed Quota view on click.
+- Adds a rendered regression test using the upstream status shape to verify `remainingPercent` and `100 - usedPercent` calculations.
+
 ## 2.0.0 — 2026-10-14
 
 - Replaces the abandoned custom Gemini OAuth component with the working upstream `dsh-plugin-oauth-subs` 0.0.121 package.
