@@ -1,7 +1,7 @@
 {
   "name": "dsh-zadloop-ultimate-toolkit",
-  "version": "1.9.1",
-  "description": "One-install ZadLoop toolkit: secure remote control, computer use, Context Surgery, Undo, mode switching, session transfer, and 72 modern themes.",
+  "version": "2.0.0",
+  "description": "One-install ZadLoop toolkit: subscription OAuth, live usage, secure remote control, computer use, Context Surgery, Undo, mode switching, session transfer, and 72 modern themes.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -23,27 +23,31 @@
   },
   "dependencies": {
     "@wasd258/dsh-context-surgery": "file:vendor/wasd258-dsh-context-surgery-0.1.2-zadloop-fixed-v4.tgz",
+    "dsh-plugin-oauth-subs": "file:vendor/dsh-plugin-oauth-subs-0.0.121.tgz",
     "dsh-zadloop-computer-use": "file:vendor/dsh-zadloop-computer-use-1.1.1.tgz",
     "dsh-zadloop-mode-switcher": "file:vendor/dsh-zadloop-mode-switcher-2.0.3.tgz",
     "dsh-zadloop-remote-control-v224": "file:vendor/dsh-zadloop-remote-control-v224-2.2.4.tgz",
     "dsh-zadloop-session-transfer": "file:vendor/dsh-zadloop-session-transfer-1.2.0.tgz",
     "dsh-zadloop-theme-studio-v530": "file:vendor/dsh-zadloop-theme-studio-v530-5.3.0.tgz",
+    "dsh-zadloop-toolkit-ui": "file:vendor/dsh-zadloop-toolkit-ui-1.0.0.tgz",
     "dsh-zadloop-undo": "file:vendor/dsh-zadloop-undo-1.5.1.tgz",
     "fflate": "file:vendor/fflate-0.8.3.tgz"
   },
   "bundledDependencies": [
     "@wasd258/dsh-context-surgery",
+    "dsh-plugin-oauth-subs",
     "dsh-zadloop-mode-switcher",
     "dsh-zadloop-computer-use",
     "dsh-zadloop-remote-control-v224",
     "dsh-zadloop-session-transfer",
     "dsh-zadloop-theme-studio-v530",
+    "dsh-zadloop-toolkit-ui",
     "dsh-zadloop-undo",
     "fflate"
   ],
   "scripts": {
-    "check": "node --check lib/index.js && npm --prefix packages/computer-use run check && npm --prefix packages/remote-control run check && npm --prefix packages/session-transfer run check",
-    "test": "node --test test/*.test.js",
+    "check": "node --check lib/index.js && npm --prefix packages/computer-use run check && npm --prefix packages/remote-control run check && npm --prefix packages/session-transfer run check && npm --prefix packages/toolkit-ui run check",
+    "test": "node --test test/*.test.js && npm --prefix packages/toolkit-ui test",
     "prepublishOnly": "npm run check && npm test"
   },
   "engines": {
@@ -59,6 +63,8 @@
     "session-transfer",
     "agent-mode",
     "computer-use",
+    "oauth-subscriptions",
+    "usage-dashboard",
     "remote-control",
     "cloudflare-tunnel"
   ],

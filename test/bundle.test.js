@@ -7,9 +7,9 @@ const root = new URL("../", import.meta.url);
 test("declares one installable managed ZadLoop bundle", async () => {
   const manifest = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
   assert.equal(manifest.name, "dsh-zadloop-ultimate-toolkit");
-  assert.equal(manifest.version, "1.9.1");
+  assert.equal(manifest.version, "2.0.0");
   assert.equal(manifest.dsh.bundle.patch, "./cordis.patch.yml");
-  assert.equal(manifest.bundledDependencies.length, 8);
+  assert.equal(manifest.bundledDependencies.length, 10);
 });
 
 test("activates every promised feature package exactly once", async () => {
@@ -19,9 +19,11 @@ test("activates every promised feature package exactly once", async () => {
     "dsh-zadloop-undo",
     "dsh-zadloop-mode-switcher",
     "dsh-zadloop-computer-use",
+    "dsh-plugin-oauth-subs",
     "dsh-zadloop-remote-control-v224",
     "dsh-zadloop-theme-studio-v530",
     "dsh-zadloop-session-transfer",
+    "dsh-zadloop-toolkit-ui",
   ]) {
     assert.equal(patch.split(name).length - 1, 1, `${name} should appear once`);
   }
@@ -33,9 +35,11 @@ test("all offline vendor archives are present", async () => {
     "dsh-zadloop-undo-1.5.1.tgz",
     "dsh-zadloop-mode-switcher-2.0.3.tgz",
     "dsh-zadloop-computer-use-1.1.1.tgz",
+    "dsh-plugin-oauth-subs-0.0.121.tgz",
     "dsh-zadloop-remote-control-v224-2.2.4.tgz",
     "dsh-zadloop-theme-studio-v530-5.3.0.tgz",
     "dsh-zadloop-session-transfer-1.2.0.tgz",
+    "dsh-zadloop-toolkit-ui-1.0.0.tgz",
     "fflate-0.8.3.tgz",
   ]) {
     await access(new URL(`vendor/${file}`, root));
@@ -48,6 +52,14 @@ test("Computer Use source matches the bundled component version", async () => {
   assert.equal(computer.name, "dsh-zadloop-computer-use");
   assert.equal(computer.version, "1.1.1");
   assert.equal(toolkit.dependencies[computer.name], `file:vendor/${computer.name}-${computer.version}.tgz`);
+});
+
+test("Toolkit UI source matches the bundled component version", async () => {
+  const toolkit = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
+  const ui = JSON.parse(await readFile(new URL("packages/toolkit-ui/package.json", root), "utf8"));
+  assert.equal(ui.name, "dsh-zadloop-toolkit-ui");
+  assert.equal(ui.version, "1.0.0");
+  assert.equal(toolkit.dependencies[ui.name], `file:vendor/${ui.name}-${ui.version}.tgz`);
 });
 
 test("Remote Control source matches the bundled component version", async () => {

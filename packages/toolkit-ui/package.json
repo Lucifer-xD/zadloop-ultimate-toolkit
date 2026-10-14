@@ -1,0 +1,43 @@
+{
+  "name": "dsh-zadloop-toolkit-ui",
+  "version": "1.0.0",
+  "description": "Shared dock polish, subscription usage summary, and scoped UI fixes for ZadLoop Ultimate Toolkit.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-connection"
+      ],
+      "immediately": true
+    }
+  },
+  "scripts": {
+    "check": "node --check lib/index.js && node --check lib/client.js",
+    "test": "node --test test/*.test.js",
+    "prepublishOnly": "npm run check && npm test"
+  },
+  "license": "MIT",
+  "author": "Lucifer",
+  "engines": {
+    "node": ">=22.19.0"
+  }
+}

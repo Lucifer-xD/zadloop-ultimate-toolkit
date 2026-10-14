@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.0 — 2026-10-14
+
+- Replaces the abandoned custom Gemini OAuth component with the working upstream `dsh-plugin-oauth-subs` 0.0.121 package.
+- Bundles the upstream subscription plugin unchanged, preserving its existing accounts and token storage when moving from a standalone install.
+- Adds a compact live Usage control under the composer showing today's token total; its tooltip also reports calls, cache hit rate, and failed calls.
+- Opens the subscription workbench's detailed Usage tab from the new dock control.
+- Adds scoped modern styling for the subscription workbench: clearer surfaces, provider navigation, active states, spacing, scrolling, and responsive behavior.
+- Replaces the malformed Transfer and Delegate graphics with stable 14px outline icons and normalizes all three toolkit dock controls.
+- Adds UI regression tests ensuring icon rules remain scoped and cannot resize unrelated ZadLoop buttons.
+
 ## 1.9.1 — 2026-10-14
 
 - Fixes Cloudflare login form submissions being rejected after the login page loaded.

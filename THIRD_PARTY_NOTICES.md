@@ -18,4 +18,6 @@ Original project: <https://github.com/101arrowz/fflate>
 
 ## Toolkit components
 
-Computer Use, Theme Studio, Mode Switcher, Session Transfer, and Same-session Undo are distributed under the toolkit's MIT terms. See the package metadata and license files retained inside each bundled dependency.
+`dsh-plugin-oauth-subs` is distributed under the MIT License by its upstream authors: <https://github.com/xxww0098/dsh-plugin-oauth-subs>. The toolkit bundles the unmodified upstream 0.0.121 backend/client and adds a separate presentation companion; it does not claim ownership of the upstream authentication integrations.
+
+Computer Use, Toolkit UI, Theme Studio, Mode Switcher, Session Transfer, and Same-session Undo are distributed under the toolkit's MIT terms. See the package metadata and license files retained inside each bundled dependency.

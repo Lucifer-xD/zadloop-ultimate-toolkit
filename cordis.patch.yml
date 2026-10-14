@@ -7,9 +7,17 @@
       name: dsh-zadloop-mode-switcher
     - id: zadloop-toolkit-computer-use-v111
       name: dsh-zadloop-computer-use
+    - id: zadloop-toolkit-oauth-subs-v00121
+      name: dsh-plugin-oauth-subs
+      config:
+        port: 8318
+        provider: oauth
+        grokLogin: device
     - id: zadloop-toolkit-remote-control-v224
       name: dsh-zadloop-remote-control-v224
     - id: zadloop-toolkit-theme-studio-v530
       name: dsh-zadloop-theme-studio-v530
     - id: zadloop-toolkit-session-transfer-v120
       name: dsh-zadloop-session-transfer
+    - id: zadloop-toolkit-ui-v100
+      name: dsh-zadloop-toolkit-ui

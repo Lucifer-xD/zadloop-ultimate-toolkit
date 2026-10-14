@@ -3,16 +3,16 @@
 
   # ZadLoop Ultimate Toolkit
 
-  **One tarball. Seven integrated tools. No plugin hunting.**
+  **One tarball. Eight integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-1.9.1-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-2.0.0-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
   [![CI](https://img.shields.io/github/actions/workflow/status/Lucifer-xD/zadloop-ultimate-toolkit/ci.yml?style=flat-square&label=tests)](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/actions/workflows/ci.yml)
 </div>
 
-ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Context Surgery, same-session Undo, live session mode switching, full chat transfer, and Theme Studio into **one self-contained plugin file**. Its dependencies are bundled inside the release, so your friends install a single `.tgz` rather than finding separate packages.
+ZadLoop Ultimate Toolkit packages subscription OAuth, live usage, authenticated Remote Control, Computer Use, Context Surgery, same-session Undo, live session mode switching, full chat transfer, and Theme Studio into **one self-contained plugin file**. Its dependencies are bundled inside the release, so your friends install a single `.tgz` rather than finding separate packages.
 
 > Community project. Not affiliated with or endorsed by DeepSeek or ZadLoop.
 
@@ -20,6 +20,8 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 | Feature | What it does | Included version |
 |---|---|---:|
+| OAuth Subscriptions | The unmodified `dsh-plugin-oauth-subs` workbench for Codex/ChatGPT, Grok, GLM, Kiro, Antigravity, Cursor, Ollama Cloud, Kimi, Devin, Cline, Command Code, and OpenCode Go, with accounts, quota, models, and usage | 0.0.121 |
+| Toolkit UI | Adds today's subscription usage beside the composer controls, opens the full Usage view on click, modernizes the subscription workbench, and repairs the Transfer and Delegate icons | 1.0.0 |
 | Remote Control | Create a secure internet link in one click, with a responsive Liquid Glass control panel and login, or use local-only, LAN/IP, and custom Cloudflare domain modes | 2.2.4 |
 | Computer Use | Let a vision-capable agent manage its own access and operate the visible Windows desktop with screenshots, mouse, keyboard, scrolling, and an expiring timer | 1.1.1 |
 | Context Surgery | Edit reply text, edit reasoning separately, remove messages from future model context, and use `/context` commands | 0.1.2 fixed-v4 |
@@ -35,12 +37,13 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-1.9.1.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-1.9.1.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-2.0.0.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-2.0.0.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
    - `dsh-zadloop-mode-switcher`
    - `dsh-zadloop-computer-use`
+   - `dsh-plugin-oauth-subs`
    - `dsh-zadloop-remote-control`
    - `dsh-zadloop-theme-studio`
    - `dsh-zadloop-session-transfer`
@@ -52,12 +55,20 @@ ZadLoop Ultimate Toolkit packages authenticated Remote Control, Computer Use, Co
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-1.9.1.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-2.0.0.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.
 
 ## Feature guide
+
+### OAuth Subscriptions and live usage
+
+Open **Subscriptions** in the sidebar to manage accounts, quotas, models, usage, and provider settings through the bundled `dsh-plugin-oauth-subs` workbench. The toolkit keeps the upstream plugin's authentication and token handling unchanged.
+
+A compact **Usage** control now sits with Themes, Transfer, and the session-mode control under the composer. It shows today's token total, refreshes safely from the subscription plugin, and opens the detailed Usage tab when clicked. Hover it for today's calls, cache hit rate, and failed-call count.
+
+The workbench has toolkit-scoped visual improvements for clearer cards, provider navigation, active states, spacing, and small-screen behavior. The same presentation layer replaces the malformed Transfer and Delegate graphics with fixed 14px outline icons without touching other ZadLoop icons.
 
 ### Remote Control
 
@@ -163,6 +174,7 @@ See [examples/WORKFLOWS.md](examples/WORKFLOWS.md) for complete workflows:
 ## Safety and privacy
 
 - No telemetry is added by this toolkit.
+- OAuth Subscriptions is bundled from the upstream MIT package without authentication changes. The toolkit UI reads only its public usage RPC and cached aggregate usage; it never reads or stores access tokens, refresh tokens, passwords, or provider secrets.
 - Remote Control is disabled by default, requires authentication for every network/tunnel mode, supports expiring/revocable sessions, and never exposes ZadLoop's private upstream cookie.
 - Session Transfer writes only to local ZadLoop session/attachment storage and never overwrites divergent histories.
 - Imported archives are checked for traversal paths, encryption, ZIP64, entry count, compressed size, expanded size, valid JSONL, contiguous event sequences, duplicate session IDs, and attachment integrity.
