@@ -3,13 +3,15 @@ window.__ModuleLoader__.load({
   factory: (require) => {
     const module = { exports: {} };
     const React = require("react");
+    const ReactDOM = require("react-dom");
     const h = React.createElement;
     const inject = ["slots", "connection"];
     const STYLE_ID = "zadloop-toolkit-ui-css";
     const STATUS_STORE = "dsh-plugin-oauth-subs.status";
 
     const CSS = `
-      .ztu-quota,.ztu-quota *{box-sizing:border-box}
+      .ztu-quota-wrap,.ztu-quota-wrap *{box-sizing:border-box}
+      .ztu-quota-wrap{position:relative;display:inline-flex;align-items:center;flex:0 0 auto;overflow:visible}
       .ztu-quota,.zms-button,.zst-launch{display:inline-flex!important;align-items:center!important;justify-content:center!important;align-self:center!important;flex:0 0 auto!important;width:auto!important;height:24px!important;min-width:0!important;max-width:100%!important;min-height:24px!important;max-height:24px!important;gap:6px!important;margin:0!important;padding:2px 8px!important;border:1px solid transparent!important;border-radius:7px!important;background:transparent!important;color:var(--dsw-alias-label-tertiary)!important;font:500 12px/18px var(--dsw-font-family,system-ui)!important;letter-spacing:0!important;white-space:nowrap!important;appearance:none!important;box-shadow:none!important;cursor:pointer;transition:background-color 120ms ease,border-color 120ms ease,color 120ms ease!important}
       .ztu-quota:hover,.zms-button:hover:not(:disabled),.zst-launch:hover,.zms-button[data-active=true],.zst-launch[aria-expanded=true]{border-color:color-mix(in srgb,currentColor 14%,transparent)!important;background:var(--dsw-alias-interactive-bg-hover)!important;color:var(--dsw-alias-label-secondary)!important}
       .ztu-quota:focus-visible,.zms-button:focus-visible,.zst-launch:focus-visible{outline:2px solid var(--dsw-focus-ring-color,var(--dsw-alias-state-business-primary))!important;outline-offset:1px!important}
@@ -26,6 +28,20 @@ window.__ModuleLoader__.load({
       .ztu-quota-value[data-tone="warn"]{color:#d99728}
       .ztu-quota-value[data-tone="bad"]{color:#e15d68}
       .ztu-quota-sep{width:1px;height:11px;background:color-mix(in srgb,currentColor 22%,transparent)}
+      .ztu-quota-pop{position:fixed;right:12px;bottom:44px;z-index:2147483000;width:268px;padding:13px;border:1px solid color-mix(in srgb,var(--dsw-alias-label-secondary) 18%,transparent);border-radius:14px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#202329) 88%,transparent);color:var(--dsw-alias-label-primary);box-shadow:0 18px 48px color-mix(in srgb,black 28%,transparent),inset 0 1px 0 color-mix(in srgb,white 8%,transparent);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%);white-space:normal;text-align:left;transform-origin:bottom right;animation:ztu-quota-in 130ms ease-out}
+      .ztu-quota-pop::after{content:"";position:absolute;right:18px;bottom:-5px;width:9px;height:9px;border-right:1px solid color-mix(in srgb,var(--dsw-alias-label-secondary) 18%,transparent);border-bottom:1px solid color-mix(in srgb,var(--dsw-alias-label-secondary) 18%,transparent);background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#202329) 94%,transparent);transform:rotate(45deg)}
+      .ztu-quota-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+      .ztu-quota-title{font-size:13px;font-weight:650;color:var(--dsw-alias-label-primary)}
+      .ztu-quota-provider{max-width:128px;overflow:hidden;text-overflow:ellipsis;padding:2px 7px;border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-state-business-primary,#7897ff) 14%,transparent);color:var(--dsw-alias-label-secondary);font-size:10.5px;line-height:16px;white-space:nowrap}
+      .ztu-quota-detail{display:grid;gap:6px;padding:7px 0}
+      .ztu-quota-detail+.ztu-quota-detail{border-top:1px solid color-mix(in srgb,var(--dsw-alias-label-secondary) 10%,transparent)}
+      .ztu-quota-detail-line{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--dsw-alias-label-secondary)}
+      .ztu-quota-detail-value{font-weight:700;font-variant-numeric:tabular-nums;color:var(--dsw-alias-label-primary)}
+      .ztu-quota-detail-value[data-tone="warn"]{color:#d99728}.ztu-quota-detail-value[data-tone="bad"]{color:#e15d68}
+      .ztu-quota-track{height:4px;overflow:hidden;border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-label-secondary) 13%,transparent)}
+      .ztu-quota-track>i{display:block;height:100%;border-radius:inherit;background:var(--dsw-alias-state-business-primary,#7897ff);transition:width 180ms ease}
+      .ztu-quota-note{padding-top:8px;border-top:1px solid color-mix(in srgb,var(--dsw-alias-label-secondary) 10%,transparent);color:var(--dsw-alias-label-tertiary);font-size:10.5px;line-height:15px}
+      @keyframes ztu-quota-in{from{opacity:0;transform:translateY(4px) scale(.98)}to{opacity:1;transform:none}}
 
       .osubs{max-width:1180px!important;padding:0 28px 28px!important;isolation:isolate}
       .osubs::before{content:"";position:absolute;inset:64px 0 0;z-index:-1;pointer-events:none;background:radial-gradient(700px 360px at 85% 4%,color-mix(in srgb,var(--osubs-accent) 7%,transparent),transparent 66%),radial-gradient(520px 300px at 3% 96%,color-mix(in srgb,#59c2ff 5%,transparent),transparent 72%)}
@@ -43,7 +59,7 @@ window.__ModuleLoader__.load({
       .osubs-bar,.osubs-ubar{overflow:hidden;border-radius:999px!important}
       .osubs-pane{scrollbar-gutter:stable;padding-right:3px}
       @media(max-width:760px){.osubs{padding:0 16px 18px!important}.osubs-ptabs{margin:0 -16px!important;padding:0 16px!important;gap:16px!important;overflow-x:auto}.osubs-body{gap:12px!important}.osubs-rail{flex-basis:164px!important}.ztu-quota-icon{display:none!important}}
-      @media(prefers-reduced-motion:reduce){.ztu-quota,.zms-button,.zst-launch,.osubs-card{transition:none!important}}
+      @media(prefers-reduced-motion:reduce){.ztu-quota,.zms-button,.zst-launch,.osubs-card{transition:none!important}.ztu-quota-pop{animation:none}}
     `;
 
     function ensureCss() {
@@ -90,21 +106,43 @@ window.__ModuleLoader__.load({
     }
 
     function quotaSummary(snapshot) {
-      const family = snapshot?.accounts?.codex;
-      const accounts = Array.isArray(family?.accounts) ? family.accounts : [];
-      const active = accounts.find((row) => row?.active)
-        || accounts.find((row) => row?.id === family?.activeId)
-        || (family?.loggedIn ? family : null);
-      const quota = active?.quota || family?.quota;
-      const rows = Array.isArray(quota?.rows) ? quota.rows : [];
-      const primary = rows.find((row) => row?.kind === "primary" || row?.key === "primary" || Number(row?.windowMinutes) === 300);
-      const weekly = rows.find((row) => row?.kind === "weekly" || row?.key === "weekly");
-      return {
-        fiveHour: remainingPercent(primary),
-        weekly: remainingPercent(weekly),
-        plan: quota?.planType || active?.planType || family?.planType || "",
-        connected: Boolean(active || family?.loggedIn),
+      const names = {
+        codex: "Codex",
+        chatgpt: "ChatGPT",
+        grok: "Grok",
+        glm: "GLM",
+        kiro: "Kiro",
+        antigravity: "Antigravity",
+        cursor: "Cursor",
+        ollama: "Ollama",
+        kimi: "Kimi",
+        devin: "Devin",
+        cline: "Cline",
+        "opencode-go": "OpenCode Go",
+        "command-code": "Command Code",
       };
+      const candidates = Object.entries(snapshot?.accounts || {}).map(([familyId, family], order) => {
+        const accounts = Array.isArray(family?.accounts) ? family.accounts : [];
+        const active = accounts.find((row) => row?.active)
+          || accounts.find((row) => row?.id === family?.activeId)
+          || (family?.loggedIn ? family : null);
+        const quota = active?.quota || family?.quota;
+        const rows = Array.isArray(quota?.rows) ? quota.rows : [];
+        const primary = rows.find((row) => row?.kind === "primary" || row?.key === "primary" || Number(row?.windowMinutes) === 300);
+        const weekly = rows.find((row) => row?.kind === "weekly" || row?.key === "weekly");
+        return {
+          order,
+          familyId,
+          provider: names[familyId] || familyId.replace(/(^|-)(\w)/g, (_, prefix, letter) => `${prefix ? " " : ""}${letter.toUpperCase()}`),
+          fiveHour: remainingPercent(primary),
+          weekly: remainingPercent(weekly),
+          plan: quota?.planType || active?.planType || family?.planType || "",
+          connected: Boolean(active || family?.loggedIn),
+          score: (primary ? 4 : 0) + (weekly ? 4 : 0) + (active ? 2 : 0) + (family?.loggedIn ? 1 : 0),
+        };
+      });
+      return candidates.sort((left, right) => right.score - left.score || left.order - right.order)[0]
+        || { provider: "Subscriptions", fiveHour: null, weekly: null, plan: "", connected: false };
     }
 
     function formatPercent(value) {
@@ -118,18 +156,17 @@ window.__ModuleLoader__.load({
       return value <= 15 ? "bad" : "warn";
     }
 
-    function openQuotaWorkbench() {
-      const buttons = Array.from(document.querySelectorAll("button,[role='button']"));
-      const launcher = buttons.find((element) => {
-        const words = `${element.getAttribute("aria-label") || ""} ${element.getAttribute("title") || ""} ${element.textContent || ""}`.trim();
-        return /subscriptions|oauth subscriptions|订阅/i.test(words) && !element.classList.contains("ztu-quota");
-      });
-      launcher?.click();
-      window.setTimeout(() => {
-        const tab = Array.from(document.querySelectorAll(".osubs-ptab,[role='tab']"))
-          .find((element) => /^(quota|额度)$/i.test((element.textContent || "").trim()));
-        tab?.click();
-      }, 80);
+    function QuotaDetail({ label, value }) {
+      const formatted = formatPercent(value);
+      return h("div", { className: "ztu-quota-detail" },
+        h("div", { className: "ztu-quota-detail-line" },
+          h("span", null, label),
+          h("span", { className: "ztu-quota-detail-value", "data-tone": quotaTone(value) }, formatted),
+        ),
+        h("span", { className: "ztu-quota-track", "aria-hidden": "true" },
+          h("i", { style: { width: `${value === null ? 0 : value}%` } }),
+        ),
+      );
     }
 
     function QuotaDock({ ctx }) {
@@ -137,6 +174,8 @@ window.__ModuleLoader__.load({
       const rpc = connection?.rpc;
       const [status, setStatus] = React.useState(readStoredStatus);
       const [available, setAvailable] = React.useState(true);
+      const [open, setOpen] = React.useState(false);
+      const [anchor, setAnchor] = React.useState(null);
 
       React.useEffect(() => {
         let live = true;
@@ -162,19 +201,40 @@ window.__ModuleLoader__.load({
       const fiveHour = formatPercent(summary.fiveHour);
       const weekly = formatPercent(summary.weekly);
       const details = summary.connected
-        ? `${summary.plan ? `${summary.plan} · ` : ""}Plan remaining: 5-hour ${fiveHour} · Weekly ${weekly}. Open quota details.`
-        : available ? "Loading your plan's 5-hour and weekly remaining quota…" : "Plan quota is unavailable. Open Subscriptions to sign in or refresh the account.";
-      return h("button", { type: "button", className: "ztu-quota", onClick: openQuotaWorkbench, title: details, "aria-label": details },
-        h("span", { className: "ztu-quota-icon", "aria-hidden": "true" }),
-        h("span", { className: "ztu-quota-item" },
-          h("span", { className: "ztu-quota-label" }, "5h"),
-          h("span", { className: "ztu-quota-value", "data-tone": quotaTone(summary.fiveHour) }, fiveHour),
+        ? `${summary.provider}${summary.plan ? ` ${summary.plan}` : ""} · Plan remaining: 5-hour ${fiveHour} · Weekly ${weekly}. Click for a quick summary.`
+        : available ? "Loading your plan's 5-hour and weekly remaining quota…" : "Plan quota is unavailable. Check the subscription connection.";
+      const toggle = (event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        setAnchor({
+          right: Math.max(12, window.innerWidth - rect.right),
+          bottom: Math.max(12, window.innerHeight - rect.top + 10),
+        });
+        setOpen((value) => !value);
+      };
+      return h("span", { className: "ztu-quota-wrap" },
+        h("button", { type: "button", className: "ztu-quota", onClick: toggle, title: details, "aria-label": details, "aria-expanded": open },
+          h("span", { className: "ztu-quota-icon", "aria-hidden": "true" }),
+          h("span", { className: "ztu-quota-item" },
+            h("span", { className: "ztu-quota-label" }, "5h"),
+            h("span", { className: "ztu-quota-value", "data-tone": quotaTone(summary.fiveHour) }, fiveHour),
+          ),
+          h("span", { className: "ztu-quota-sep", "aria-hidden": "true" }),
+          h("span", { className: "ztu-quota-item" },
+            h("span", { className: "ztu-quota-label" }, "Week"),
+            h("span", { className: "ztu-quota-value", "data-tone": quotaTone(summary.weekly) }, weekly),
+          ),
         ),
-        h("span", { className: "ztu-quota-sep", "aria-hidden": "true" }),
-        h("span", { className: "ztu-quota-item" },
-          h("span", { className: "ztu-quota-label" }, "Week"),
-          h("span", { className: "ztu-quota-value", "data-tone": quotaTone(summary.weekly) }, weekly),
-        ),
+        open && ReactDOM.createPortal(h("section", { className: "ztu-quota-pop", style: anchor || undefined, role: "status", "aria-live": "polite" },
+          h("div", { className: "ztu-quota-head" },
+            h("span", { className: "ztu-quota-title" }, "Plan remaining"),
+            h("span", { className: "ztu-quota-provider" }, `${summary.provider}${summary.plan ? ` · ${summary.plan}` : ""}`),
+          ),
+          h(QuotaDetail, { label: "5-hour limit", value: summary.fiveHour }),
+          h(QuotaDetail, { label: "Weekly limit", value: summary.weekly }),
+          h("div", { className: "ztu-quota-note" }, available
+            ? "Updates automatically from your connected subscription account."
+            : "Quota refresh is temporarily unavailable."),
+        ), document.body),
       );
     }
 

@@ -5,7 +5,7 @@
 
   **One tarball. Eight integrated tools. No plugin hunting.**
 
-  ![Version](https://img.shields.io/badge/version-2.0.1-7c8cff?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-2.0.2-7c8cff?style=flat-square)
   ![License](https://img.shields.io/badge/license-MIT-45c992?style=flat-square)
   ![ZadLoop](https://img.shields.io/badge/ZadLoop-0.5.1-ff7a90?style=flat-square)
   ![Offline bundle](https://img.shields.io/badge/install-offline_bundle-f4c45e?style=flat-square)
@@ -21,7 +21,7 @@ ZadLoop Ultimate Toolkit packages subscription OAuth, live remaining plan quota,
 | Feature | What it does | Included version |
 |---|---|---:|
 | OAuth Subscriptions | The unmodified `dsh-plugin-oauth-subs` workbench for Codex/ChatGPT, Grok, GLM, Kiro, Antigravity, Cursor, Ollama Cloud, Kimi, Devin, Cline, Command Code, and OpenCode Go, with accounts, quota, models, and usage | 0.0.121 |
-| Toolkit UI | Shows the active Codex plan's 5-hour and weekly quota remaining beside the composer controls, opens Quota on click, modernizes the subscription workbench, and repairs the Transfer and Delegate icons | 1.0.1 |
+| Toolkit UI | Shows the connected plan's 5-hour and weekly quota remaining beside the composer controls, opens a quick inline summary on click, modernizes the subscription workbench, and repairs the Transfer and Delegate icons | 1.0.3 |
 | Remote Control | Create a secure internet link in one click, with a responsive Liquid Glass control panel and login, or use local-only, LAN/IP, and custom Cloudflare domain modes | 2.2.4 |
 | Computer Use | Let a vision-capable agent manage its own access and operate the visible Windows desktop with screenshots, mouse, keyboard, scrolling, and an expiring timer | 1.1.1 |
 | Context Surgery | Edit reply text, edit reasoning separately, remove messages from future model context, and use `/context` commands | 0.1.2 fixed-v4 |
@@ -37,7 +37,7 @@ ZadLoop Ultimate Toolkit packages subscription OAuth, live remaining plan quota,
 
 ### ZadLoop interface
 
-1. Download [`dsh-zadloop-ultimate-toolkit-2.0.1.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-2.0.1.tgz) from the latest GitHub release.
+1. Download [`dsh-zadloop-ultimate-toolkit-2.0.2.tgz`](https://github.com/Lucifer-xD/zadloop-ultimate-toolkit/releases/latest/download/dsh-zadloop-ultimate-toolkit-2.0.2.tgz) from the latest GitHub release.
 2. If standalone copies are installed, disable or uninstall these first to avoid duplicate buttons:
    - `@wasd258/dsh-context-surgery`
    - `dsh-zadloop-undo`
@@ -55,7 +55,7 @@ ZadLoop Ultimate Toolkit packages subscription OAuth, live remaining plan quota,
 
 ```powershell
 cd "$env:APPDATA\ZadLoop\harness\profiles\web"
-pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-2.0.1.tgz"
+pnpm add "C:\path\to\dsh-zadloop-ultimate-toolkit-2.0.2.tgz"
 ```
 
 Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package manager does not do that automatically.
@@ -66,7 +66,7 @@ Add `dsh-zadloop-ultimate-toolkit` once to `dsh.profile.bundles` if your package
 
 Open **Subscriptions** in the sidebar to manage accounts, quotas, models, usage, and provider settings through the bundled `dsh-plugin-oauth-subs` workbench. The toolkit keeps the upstream plugin's authentication and token handling unchanged.
 
-A compact plan control now sits with Themes, Transfer, and the session-mode control under the composer. It shows the active Codex subscription account's **5-hour** and **weekly** percentages remaining, refreshes from the subscription plugin's public quota snapshot, and opens the detailed Quota tab when clicked. Low remaining quota is highlighted without changing any authentication or provider behavior.
+A compact plan control now sits with Themes, Transfer, and the session-mode control under the composer. It automatically finds the connected subscription provider exposing rolling limits and shows its **5-hour** and **weekly** percentages remaining directly in the dock. Clicking it opens a small glass summary with two progress lines without leaving the chat. Low remaining quota is highlighted without changing any authentication or provider behavior.
 
 The workbench has toolkit-scoped visual improvements for clearer cards, provider navigation, active states, spacing, and small-screen behavior. The same presentation layer replaces the malformed Transfer and Delegate graphics with fixed 14px outline icons without touching other ZadLoop icons.
 

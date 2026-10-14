@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2 — 2026-10-14
+
+- Fixes the dock quota source so connected providers such as Antigravity are detected instead of looking only for a Codex account.
+- Keeps the 5-hour and weekly percentages visible directly in the composer dock.
+- Replaces click-through navigation with a compact glass popover containing two labeled progress lines and the connected provider/plan.
+
 ## 2.0.1 — 2026-10-14
 
 - Corrects the composer metric to show the active Codex subscription plan's quota **remaining**, rather than consumed token usage.

@@ -12,6 +12,8 @@ test("registers a compact plan-quota control in the composer dock", () => {
   assert.match(client, /remainingPercent/);
   assert.match(client, /5-hour/);
   assert.match(client, /Weekly/);
+  assert.match(client, /ztu-quota-pop/);
+  assert.doesNotMatch(client, /openQuotaWorkbench|launcher\?\.click/);
 });
 
 test("icon fixes are scoped to the toolkit controls", () => {
@@ -24,7 +26,7 @@ test("loads through ZadLoop's module loader, registers the dock slot, and render
   const appended = [];
   const cached = {
     accounts: {
-      codex: {
+      antigravity: {
         activeId: "account-1",
         accounts: [{
           id: "account-1",
@@ -52,6 +54,7 @@ test("loads through ZadLoop's module loader, registers the dock slot, and render
       setItem() {},
     },
     document: {
+      body: {},
       getElementById() { return null; },
       createElement() { return {}; },
       head: { appendChild(value) { appended.push(value); } },
@@ -63,11 +66,21 @@ test("loads through ZadLoop's module loader, registers the dock slot, and render
   const React = {
     createElement(type, props, ...children) { return { type, props: props || {}, children }; },
     useEffect() {},
-    useState(initial) { return [typeof initial === "function" ? initial() : initial, () => {}]; },
+    useState(initial) {
+      const value = typeof initial === "function" ? initial() : initial;
+      return [value === false ? true : value, () => {}];
+    },
+  };
+  const ReactDOM = {
+    createPortal(node, target) {
+      assert.equal(target, sandbox.document.body);
+      return node;
+    },
   };
   const plugin = definition.factory((id) => {
-    assert.equal(id, "react");
-    return React;
+    if (id === "react") return React;
+    if (id === "react-dom") return ReactDOM;
+    assert.fail(`Unexpected module ${id}`);
   });
   let registration;
   const ctx = {
@@ -94,5 +107,9 @@ test("loads through ZadLoop's module loader, registers the dock slot, and render
       : node?.children?.map(text).join(" ") || "";
   assert.match(text(rendered), /5h\s+72%/);
   assert.match(text(rendered), /Week\s+41%/);
-  assert.match(rendered.props.title, /Plan remaining: 5-hour 72% · Weekly 41%/);
+  assert.match(text(rendered), /Plan remaining/);
+  assert.match(text(rendered), /Antigravity/);
+  const trigger = rendered.children[0];
+  assert.match(trigger.props.title, /Plan remaining: 5-hour 72% · Weekly 41%/);
+  assert.equal(trigger.props["aria-expanded"], true);
 });
